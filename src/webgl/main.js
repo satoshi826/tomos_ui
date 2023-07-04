@@ -13,6 +13,9 @@ export async function main(core) {
   renderer.render([testF])
   setHandler('cameraPosition', (e) => testF.set({cameraPosition: e}))
 
+  testF.set({lightPos: [5, 5]})
+
+
   const animation = new Animation({callback: () => {
     renderer.render([testF])
   }, interval: 0})

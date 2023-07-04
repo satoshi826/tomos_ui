@@ -95,17 +95,6 @@ const sendMouse = (canvasWrapperE) => {
     sendState({mouse: {x: null, y: null}})
   }
 
-  const topBarHeight = pxToInt(shape.topbar.height)
-
-  canvasWrapperE._on.touchmove = ({changedTouches}) => {
-    {
-      const touch = changedTouches[0]
-      const x = 2 * ((touch.clientX) / canvasWrapperE.offsetWidth) - 1
-      const y = -(2 * ((touch.clientY - topBarHeight) / canvasWrapperE.offsetHeight) - 1)
-      sendState({mouse: {x, y}})
-    }
-  }
-
 }
 
 const setPosition = (canvasWrapperE) => {
@@ -114,7 +103,9 @@ const setPosition = (canvasWrapperE) => {
 
   let start = null
   let startCamera = null
-  const reset = () => start = startCamera = null
+  let baseDistance = null
+
+  const reset = () => start = startCamera = baseDistance = null
 
   let [width, height] = getCanvasSize()
   let canvasAspect = width / height
@@ -144,7 +135,7 @@ const setPosition = (canvasWrapperE) => {
 
   canvasWrapperE._on.wheel = ({offsetX, offsetY, deltaY}) => {
     set(([x, y, z]) => {
-      const newZ = Math.max(z + deltaY / 100, 10)
+      const newZ = Math.max(z + (z * deltaY / 1500), 10)
       if (z === 10 && newZ === 10) return [x, y, z]
       const zoomIn = deltaY < 0 ? 1 : -1
       const wx = 2 * (offsetX / canvasWrapperE.offsetWidth) - 1
@@ -157,6 +148,48 @@ const setPosition = (canvasWrapperE) => {
 
   canvasWrapperE._on.mouseup = () => reset()
   canvasWrapperE._on.mouseleave = () => reset()
+
+  //----------------------------------------------------------------
+
+  const topBarHeight = pxToInt(shape.topbar.height)
+
+  canvasWrapperE._on.touchstart = ({changedTouches}) => {
+    const [{clientX, clientY}] = changedTouches
+    start = [clientX, clientY]
+  }
+
+  canvasWrapperE._on.touchmove = ({changedTouches}) => {
+
+    const isPinch = changedTouches.length > 1
+
+    if (start && !isPinch) {
+      const [{clientX, clientY}] = changedTouches
+      startCamera ??= get()
+      const diffX = - coffX * (clientX - start[0]) / width
+      const diffY = coffY * (clientY - start[1]) / height
+      set(([, , z]) => [(startCamera[0] + z * diffX), (startCamera[1] + z * diffY), z])
+    }
+
+    if (start && isPinch) {
+      const [{clientX:x1, clientY:y1}, {clientX:x2, clientY:y2}] = changedTouches
+      console.log(x1, y1, x2, y2)
+      const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+      baseDistance ??= distance
+      const zoom = 0.2 * ((distance / baseDistance) - 1)
+      set(([x, y, z]) => {
+        const newZ = Math.max(z + (z * -zoom), 10)
+        if (z === 10 && newZ === 10) return [x, y, z]
+        const zoomIn = zoom > 0 ? 1 : -1
+        const wx = ((x1 + x2) / canvasWrapperE.offsetWidth) - 1
+        const wy = - ((y1 + y2) / canvasWrapperE.offsetHeight) - 1
+        const diffX = z * coffX * wx * 0.005 * zoomIn
+        const diffY = z * coffX * wy * 0.005 * zoomIn
+        return [x + diffX, y + diffY, newZ]
+      })
+    }
+  }
+
+  canvasWrapperE._on.touchend = () => reset()
 
 }
 
