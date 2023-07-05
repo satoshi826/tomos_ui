@@ -3,6 +3,7 @@ import {style, pxToInt} from '../../../lib/theme'
 import {snippets as _} from '../../theme/snippets'
 import {shape} from '../../theme/shape'
 import {state} from '../../../lib/state'
+import {oForEach} from '../../../lib/util'
 
 import CanvasWorker from '../../webgl/worker?worker'
 const canvasWorker = new CanvasWorker()
@@ -143,8 +144,8 @@ const setPosition = (canvasWrapperE) => {
       const zoomIn = deltaY < 0 ? 1 : -1
       const wx = 2 * (offsetX / canvasWrapperE.offsetWidth) - 1
       const wy = - (2 * (offsetY / canvasWrapperE.offsetHeight) - 1)
-      const diffX = z * coffX * wx * 0.045 * zoomIn
-      const diffY = z * coffX * wy * 0.045 * zoomIn
+      const diffX = z * coffX * wx * 0.05 * zoomIn
+      const diffY = z * coffY * wy * 0.05 * zoomIn
       return [x + diffX, y + diffY, newZ]
     })
   }
@@ -154,7 +155,7 @@ const setPosition = (canvasWrapperE) => {
 
   //----------------------------------------------------------------
 
-  // const topBarHeight = pxToInt(shape.topbar.height)
+  const topBarHeight = pxToInt(shape.topbar.height)
 
   let isPinch = null
 
@@ -179,7 +180,7 @@ const setPosition = (canvasWrapperE) => {
     }
 
     if (start && isPinch) {
-      const {0: {clientX:x1, clientY:y1}, 1: {clientX:x2, clientY:y2}} = changedTouches
+      let {0: {clientX:x1, clientY:y1}, 1: {clientX:x2, clientY:y2}} = changedTouches
       const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
       baseDistance ??= distance
       const zoom = 0.15 * ((distance / baseDistance) - 1)
@@ -187,10 +188,18 @@ const setPosition = (canvasWrapperE) => {
         const newZ = Math.max(z + (z * -zoom), 10)
         if (z === 10 && newZ === 10) return [x, y, z]
         const zoomIn = zoom > 0 ? 1 : -1
-        const wx = ((x1 + x2) / canvasWrapperE.offsetWidth) - 1
-        const wy = - ((y1 + y2) / canvasWrapperE.offsetHeight) - 1
-        const diffX = z * coffX * wx * 0.04 * zoomIn
-        const diffY = z * coffX * wy * 0.04 * zoomIn
+        const wx = 2 * (((x1 + x2) / 2) / canvasWrapperE.offsetWidth) - 1
+        const wy = - (2 * (((((y1 + y2) / 2) - topBarHeight) / canvasWrapperE.offsetHeight)) - 1)
+        console.log(`_$1 y1_${y1}`)
+        console.log(`_$2 y2_${y2}`)
+        console.log(`_$3 wy_${wy}`)
+        console.log(`_$4 topBarHeight_${topBarHeight}`)
+
+        const diffX = z * coffX * wx * 0.01 * zoomIn
+        const diffY = z * coffY * wy * 0.01 * zoomIn
+
+        console.log(`_$5 diffY_${diffY}`)
+
         return [x + diffX, y + diffY, newZ]
       })
     }
@@ -205,31 +214,31 @@ const setPosition = (canvasWrapperE) => {
 
 //----------------------------------------------------------------
 
-// const sendKeydown = () => {
-//   let keyDownList = {}
-//   const send = (keyDownList) => canvasWorker.postMessage({keyDown: keyDownList})
-//   document.addEventListener('keydown', ({code}) => {
-//     if(!keyDownList[code]) {
-//       keyDownList[code] = true
-//       send(keyDownList)
-//     }
-//   })
-//   document.addEventListener('keyup', ({code}) => {
-//     if(keyDownList[code]) {
-//       keyDownList[code] = false
-//       send(keyDownList)
-//       delete keyDownList[code]
-//     }
-//   })
-// }
+const sendKeydown = () => {
+  let keyDownList = {}
+  const send = (keyDownList) => sendState({keyDownList})
+  document.addEventListener('keydown', ({code}) => {
+    if(!keyDownList[code]) {
+      keyDownList[code] = true
+      send(keyDownList)
+    }
+  })
+  document.addEventListener('keyup', ({code}) => {
+    if(keyDownList[code]) {
+      keyDownList[code] = false
+      send(keyDownList)
+      delete keyDownList[code]
+    }
+  })
+}
 
-// const recieveState = () => {
-//   const setterMap = {}
-//   canvasWorker.onmessage = ({data}) => {
-//     oForEach(data, ([k, v]) => {
-//       setterMap[k] ??= state({key: k, init: v})[1]
-//       setterMap[k](v)
-//     })
-//   }
-// }
+const recieveState = () => {
+  const setterMap = {}
+  canvasWorker.onmessage = ({data}) => {
+    oForEach(data, ([k, v]) => {
+      setterMap[k] ??= state({key: k, init: v})[1]
+      setterMap[k](v)
+    })
+  }
+}
 
