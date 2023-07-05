@@ -60,10 +60,10 @@ const init = () => {
   canvasE.height = canvasE.clientHeight
 
   const offscreenCanvas = canvasE.transferControlToOffscreen()
-  canvasWorker.postMessage({init: {
-    canvas    : offscreenCanvas,
-    pixelRatio: window.devicePixelRatio
-  }}, [offscreenCanvas])
+  // canvasWorker.postMessage({init: {
+  //   canvas    : offscreenCanvas,
+  //   pixelRatio: window.devicePixelRatio
+  // }}, [offscreenCanvas])
 
   state({key: 'canvasSize', init: [canvasE.clientWidth, canvasE.clientHeight]})
   return {canvasE, canvasWrapperE}
@@ -172,7 +172,6 @@ const setPosition = (canvasWrapperE) => {
 
     if (start && isPinch) {
       const {0: {clientX:x1, clientY:y1}, 1: {clientX:x2, clientY:y2}} = changedTouches
-      console.log(`_$4 ${Object.keys(changedTouches)}`)
       const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
       baseDistance ??= distance
       const zoom = 0.2 * ((distance / baseDistance) - 1)
