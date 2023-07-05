@@ -26,6 +26,8 @@ export const snippets = {
   wh    : (wh) => ({height: wh, width: wh}),
   bRd   : (br) => ({borderRadius: br}),
   transX: (x) => ({transform: `translateX(${x})`}),
+  transY: (y) => ({transform: `translateY(${y})`}),
+  trans : ({x, y}) => ({transform: `translate(${x}, ${y})`}),
   h100  : {height: '100%'},
   w100  : {width: '100%'},
   wh100 : {

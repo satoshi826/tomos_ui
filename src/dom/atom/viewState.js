@@ -1,12 +1,12 @@
 import {state} from '../../../lib/state'
 import {id} from '../../../lib/dom'
 
-export function viewState({key}) {
+export function viewState({key, handler}) {
 
   queueMicrotask(() => {
     const watch = state({key})[0]
     const viewE = id(`view-${key}`)
-    watch((v) => viewE.innerText = key + ' : ' + v)
+    watch((v) => viewE.innerText = key + ' : ' + handler ? handler(v) : v)
   })
 
   return /* html */`

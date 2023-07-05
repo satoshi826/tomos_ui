@@ -121,7 +121,7 @@ const setPosition = (canvasWrapperE) => {
   })
 
   canvasWrapperE._on.mousedown = ({clientX, clientY}) => {
-    start = [clientX, clientY]
+    start ??= [clientX, clientY]
   }
 
   canvasWrapperE._on.mousemove = ({clientX, clientY}) => {
@@ -151,11 +151,11 @@ const setPosition = (canvasWrapperE) => {
 
   //----------------------------------------------------------------
 
-  const topBarHeight = pxToInt(shape.topbar.height)
+  // const topBarHeight = pxToInt(shape.topbar.height)
 
   canvasWrapperE._on.touchstart = ({changedTouches}) => {
     const [{clientX, clientY}] = changedTouches
-    start = [clientX, clientY]
+    start ??= [clientX, clientY]
   }
 
   canvasWrapperE._on.touchmove = ({changedTouches}) => {
@@ -171,8 +171,8 @@ const setPosition = (canvasWrapperE) => {
     }
 
     if (start && isPinch) {
-      const [{clientX:x1, clientY:y1}, {clientX:x2, clientY:y2}] = changedTouches
-      console.log(x1, y1, x2, y2)
+      const {0: {clientX:x1, clientY:y1}, 1: {clientX:x2, clientY:y2}} = changedTouches
+      console.log(`_$4 ${Object.keys(changedTouches)}`)
       const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
       baseDistance ??= distance
       const zoom = 0.2 * ((distance / baseDistance) - 1)
@@ -184,6 +184,10 @@ const setPosition = (canvasWrapperE) => {
         const wy = - ((y1 + y2) / canvasWrapperE.offsetHeight) - 1
         const diffX = z * coffX * wx * 0.005 * zoomIn
         const diffY = z * coffX * wy * 0.005 * zoomIn
+        console.log(`_$0 x1 ${x1}`)
+        console.log(`_$1 x2 ${x2}`)
+        console.log(`_$2 y1 ${y1}`)
+        console.log(`_$3 y2 ${y2}`)
         return [x + diffX, y + diffY, newZ]
       })
     }
