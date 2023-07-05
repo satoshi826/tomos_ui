@@ -46,6 +46,9 @@ export const snippets = {
   nonEve: {
     pointerEvents: 'none'
   },
+  nowrap: {
+    whiteSpace: 'nowrap'
+  },
   bgC: ({type = 'background', i = 0, val, alpha} = {}) => {
     if(val) return {backgroundColor: val}
     if(alpha) return {backgroundColor: `rgba(var(--${type}${i}-rgb),${alpha})`}

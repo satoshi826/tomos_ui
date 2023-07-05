@@ -57,12 +57,13 @@ const interceptLog = (el) => {
       }else{
         logList.pop()
         logList.unshift(args[0])
-        log(...args)
       }
       el.innerHTML = logList.reduce((res, log) => {
         res += `<div>${log}</div>`
         return res
       }, '')
+    }else{
+      log(...args)
     }
   }
 }
