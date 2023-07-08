@@ -49,6 +49,9 @@ export const snippets = {
   nowrap: {
     whiteSpace: 'nowrap'
   },
+  breakWord: {
+    wordWrap: 'break-word'
+  },
   bgC: ({type = 'background', i = 0, val, alpha} = {}) => {
     if(val) return {backgroundColor: val}
     if(alpha) return {backgroundColor: `rgba(var(--${type}${i}-rgb),${alpha})`}
@@ -58,5 +61,8 @@ export const snippets = {
     if(val) return {color: val}
     if(alpha) return {color: `rgba(var(--${type}${i}-rgb),${alpha})`}
     return {color: `var(--${type}${i})`}
-  }
+  },
+  txGrow: (size) => ({
+    textShadow: `0 0 ${size / 2}px var(--primary${-1}),0 0 ${size}px var(--primary${1}),0 0 ${size * 1.5}px var(--primary${2})`,
+  })
 }

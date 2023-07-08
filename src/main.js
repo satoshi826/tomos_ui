@@ -3,30 +3,29 @@ import {init as initTheme} from './theme/init'
 import {style} from '../lib/theme'
 import {snippets as _} from './theme/snippets'
 
-import {frame} from './dom/frame/frame'
-import {side} from './dom/frame/side'
-import {tool} from './dom/frame/tool'
-import {nav} from './dom/frame/nav'
+import frame from './dom/frame'
 
 import {canvas} from './dom/canvas'
 import {core} from './core'
+import {domContainer} from './dom/world/domContainer'
 import {showPosts} from './dom/world/post'
+import {postAction} from './dom/world/postAction'
 
 core()
 initTheme()
 
-id('app').innerHTML = /* html */`
-  ${frame({
-    top    : tool(),
-    side   : side(),
-    content: canvas(),
-    bottom : nav(),
-  })}
-`
-
 //----------------------------------------------------------------
 
+id('app').innerHTML = /* html */`
+  ${frame({
+    content: canvas()
+  })}
+`
+//----------------------------------------------------------------
+
+domContainer()
 showPosts()
+postAction()
 
 //----------------------------------------------------------------
 
@@ -35,7 +34,9 @@ const appC = {
   ..._.flex({col: true}),
   ..._.bgC(),
   ..._.txC(),
-  WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+  WebkitTapHighlightColor  : 'rgba(0,0,0,0)',
+  '-webkit-font-smoothing' : 'antialiased',
+  '-moz-osx-font-smoothing': 'grayscale',
 }
 
 style.set('#app', appC)

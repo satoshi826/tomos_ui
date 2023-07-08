@@ -2,20 +2,23 @@ import {state} from '../../lib/state'
 import {sendState} from '../dom/canvas'
 import {setPost} from '../dom/world/post'
 
+import {range, aToO} from '../../lib/util'
+
 export function core() {
 
-  sendCameraPosition({init: [0, 0, 10]})
+  sendCameraPosition({init: [0, 0, 5]})
 
-  const testMessage = {
-    testId1: {
-      v: 'this is test message1',
-      p: [-5, 5]
+  const size = 20
+  let testMessage = aToO(range(size * size), (i) => [
+    `testId${i}`,
+    {
+      v: 'テストポスト' + i,
+      p: [(i % size), Math.floor(i / size)]
     },
-    testId2: {
-      v: 'this is test message2',
-      p: [-5, -5]
-    },
-  }
+  ])
+
+  console.log(testMessage)
+
   setPost(testMessage)
 }
 

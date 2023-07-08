@@ -4,7 +4,7 @@ import {style, icon} from '../../../lib/theme'
 import {snippets as _} from '../../theme/snippets'
 
 
-export function tool() {
+export function tool(content = '') {
 
   queueMicrotask(() => {
     const menuButtonE = id('menu-button')
@@ -13,15 +13,16 @@ export function tool() {
   })
 
   style.set('#toolbar', toolBarC)
-  style.set('#menu-button', menuButtonC)
-  style.hover('#menu-button', menuButtonHoverC)
+  style.set('.menu-button', menuButtonC)
+  style.hover('.menu-button', menuButtonHoverC)
 
   return /* html */`
     <div id="toolbar">
-      <label id="menu-button">
-        ${icon('menu', {size: '40px'})}
+      <label id="menu-button" class="menu-button">
+        ${icon('menu', {size: '50px'})}
       </label>
-      <label id="menu-button">
+      ${content}
+      <label class="menu-button">
         ${icon('account_circle', {size: '40px'})}
       </label>
     </div>
@@ -33,6 +34,7 @@ const toolBarC = {
   ..._.px('12px'),
   ..._.flex({align: 'center', justify: 'space-between'}),
   ..._.minH('var(--topbar-height)'),
+  zIndex      : 1100,
   borderBottom: '1px solid var(--backgorund2)',
 }
 
@@ -40,14 +42,15 @@ const menuButtonC = {
   ..._.flex({align: 'center', justify: 'center'}),
   ..._.txC({type: 'text', i: 1}),
   ..._.dur('0.4s'),
-  ..._.wh('48px'),
+  ..._.wh('64px'),
   ..._.bRd('50%'),
   cursor: 'pointer',
   ..._.rlt,
 }
 
+
 const menuButtonHoverC = {
   ..._.txC({type: 'primary', i: 0}),
-  ..._.bgC({type: 'gray', i: 0, alpha: 0.2}),
+  ..._.txGrow(10),
 }
 

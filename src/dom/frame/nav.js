@@ -22,6 +22,7 @@ const navBarC = {
   ..._.px('12px'),
   ..._.flex({align: 'center', justify: 'space-around'}),
   ..._.minH('var(--navbar-height)'),
+  zIndex   : 1100,
   borderTop: '1px solid var(--backgorund0)',
 }
 
@@ -35,8 +36,8 @@ const iconButton = ({name, handler}) => {
   })
 
   return /* html */`
-    <div id="${name}iconbutton">
+    <span id="${name}iconbutton">
       ${icon(name, {size: '32px'})}
-    </div>
+    </span>
 `
 }

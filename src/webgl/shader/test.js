@@ -29,7 +29,7 @@ export const test = () => ({
       float gridPower = max((2.+unitLog-scaleLog)*.5, .0);
       float gridV = smoothstep(1.-(scale*.004/unit), 1., abs(2./unit*mod(p.x,unit)-1.));
       float gridH = smoothstep(1.-(scale*.004/unit), 1., abs(2./unit*mod(p.y,unit)-1.));
-      return .75*gridPower*(gridV+gridH);
+      return .25*gridPower*(gridV+gridH);
     }
 
     void main(void){
@@ -57,7 +57,7 @@ export const test = () => ({
       float grid3 = grid(currentP,100.,baseScale);
       float grid4 = grid(currentP,1000.,baseScale);
 
-      float point2 = baseScale * 5. / (pow(baseScale, 2.) * length(lightPos - currentP));
+      float point2 = baseScale * 01. / (pow(baseScale, 2.) * length(lightPos - currentP));
 
       float sum = grid4+grid3+grid2+grid1+point2;
       outColor = vec4(vec3(sum+base), 0.5);

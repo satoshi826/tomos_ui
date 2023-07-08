@@ -16,5 +16,13 @@ export const init = () => {
     mediaQuery.addEventListener('change', ({matches}) => setIs(matches))
   })
 
+  style.set('body', {
+    fontFamily               : '\'Noto Sans JP\', sans-serif',
+    fontWeight               : 400,
+    fontDisplay              : 'swap',
+    '-webkit-font-smoothing' : 'antialiased',
+    '-moz-osx-font-smoothing': 'grayscale',
+  })
+
 }
 

@@ -29,7 +29,7 @@ const sideBarC = {
   ..._.maxW('var(--sidebar-width)'),
   ..._.h100,
   ..._.rlt,
-  zIndex     : 1000,
+  zIndex     : 1100,
   borderRight: '1.5px solid var(--background2)',
 }
 
@@ -38,8 +38,8 @@ const closeC = _.transX('calc(-1 *var(--sidebar-width))')
 const closedSideBarC = {...sideBarC, ...closeC}
 
 const sideBarMobileC = {
-  ..._.bgC({i: 1, alpha: 0.4}),
-  backdropFilter: 'blur(8px) saturate(60%)',
+  ..._.bgC({i: 3, alpha: 0.1}),
+  backdropFilter: 'blur(4px) saturate(150%)',
 }
 
 //----------------------------------------------------------------
@@ -94,7 +94,7 @@ const dragSideber = () => {
       start ??= clientX
       now = clientX
       const position = Math.max(0, (start - now))
-      sideBarE.setAttribute('style', `transform: translateX(-${position}px); transition: all 0s;`)
+      sideBarE.setAttribute('style', `transform: translate3D(-${position}px,0px,0px); transition: all 0s;`)
       if ((width / 2) < position) set(false)
     }
     sideBarE.ontouchend = () => {

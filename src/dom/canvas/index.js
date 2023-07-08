@@ -52,6 +52,7 @@ const canvasC = {
 const coverC = {
   ..._.abs,
   ..._.wh100,
+  overflow : 'hidden',
   boxShadow: `
   inset 0 0 100px rgba(0, 0, 0, 0.6),
   inset 0 0 200px rgba(0, 0, 0, 0.4);`,
@@ -142,14 +143,14 @@ const setPosition = (canvasWrapperE) => {
   }
 
   canvasWrapperE._on.wheel = (event) => {
-    const {offsetX, offsetY, deltaY} = event
+    const {offsetX, offsetY, deltaY} = event // ToDo: postと重なっているときの対応
     set(([x, y, z]) => {
-      const newZ = Math.max(z + (z * deltaY / 1500), 10)
-      if (z === 10 && newZ === 10) return [x, y, z]
+      const newZ = Math.max(z + (z * deltaY / 1500), 1)
+      if (z === 1 && newZ === 1) return [x, y, z]
       const zoomIn = deltaY < 0 ? 1 : -1
       const [wx, wy] = postionAdapter.pxToNormal(offsetX, offsetY)
-      const diffX = z * coffX * wx * 0.05 * zoomIn
-      const diffY = z * coffY * wy * 0.05 * zoomIn
+      const diffX = z * coffX * wx * 0.025 * zoomIn
+      const diffY = z * coffY * wy * 0.025 * zoomIn
       return [x + diffX, y + diffY, newZ]
     })
   }
@@ -189,8 +190,8 @@ const setPosition = (canvasWrapperE) => {
       baseDistance ??= distance
       const zoom = 0.15 * ((distance / baseDistance) - 1)
       set(([x, y, z]) => {
-        const newZ = Math.max(z + (z * -zoom), 10)
-        if (z === 10 && newZ === 10) return [x, y, z]
+        const newZ = Math.max(z + (z * -zoom), 1)
+        if (z === 1 && newZ === 1) return [x, y, z]
         const zoomIn = zoom > 0 ? 1 : -1
         const [wx, wy] = postionAdapter.pxToNormal((x1 + x2) / 2, ((y1 + y2) / 2) - topBarHeight)
         const diffX = z * coffX * wx * 0.01 * zoomIn

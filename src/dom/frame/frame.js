@@ -34,7 +34,7 @@ const outerC = {
   ..._.flex({col: true}),
   ..._.wh('100%'),
   ..._.maxH('100%'),
-  overflowX: 'hidden',
+  overflow: 'hidden',
 }
 
 const innerC = {
