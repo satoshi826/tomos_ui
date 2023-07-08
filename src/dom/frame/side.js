@@ -57,14 +57,20 @@ const toggleSideber = () => {
   watchIsOpen((isOpen) => {
     style.set('#sidebar', isOpen ? sideBarC : closedSideBarC)
     document.removeEventListener('mousedown', closeSidebar)
-    if (isOpen && getIsMobile()) document.addEventListener('mousedown', closeSidebar)
+    document.removeEventListener('touchstart', closeSidebar)
+    if (isOpen && getIsMobile()) {
+      document.addEventListener('mousedown', closeSidebar)
+      document.addEventListener('touchstart', closeSidebar)
+    }
   })
 
   watchIsMobile((isMobile) => {
     if(isMobile) {
       document.addEventListener('mousedown', closeSidebar)
+      document.addEventListener('touchstart', closeSidebar)
     } else{
       document.removeEventListener('mousedown', closeSidebar)
+      document.removeEventListener('touchstart', closeSidebar)
     }
   })
 }

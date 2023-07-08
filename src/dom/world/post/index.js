@@ -1,24 +1,63 @@
-import {state} from '../../../lib/state'
-import {id} from '../../../lib/dom'
+import {state} from '../../../../lib/state'
+import {id} from '../../../../lib/dom'
+import {oForEach} from '../../../../lib/util'
+import {style} from '../../../../lib/theme'
+import {snippets as _} from '../../../theme/snippets'
 
-const [watch, set] = state({key: 'worldPosts', init: })
+const [watchPosts, set] = state({key: 'worldPosts', init: {}})
+const [watchResize] = state({key: 'resize'})
+const [watchCamera] = state({key: 'cameraPosition'})
 
-function posts({key}) {
+export function showPosts() {
 
-  queueMicrotask(() => {
-    const watch = state({key})[0]
-    const viewE = id(`view-${key}`)
-    watch((v) => viewE.innerText = key + ' : ' + handler ? handler(v) : v)
+  const app = id('app')
+  let postsContainer = document.createElement('div')
+  postsContainer.id = 'postsContainer'
+  app.appendChild(postsContainer)
+  style.set('#postsContainer', {..._.nonSel, ..._.abs, zIndex: 1000, ..._.wh('0px')})
+  style.set('.worldPost', {..._.abs})
+
+  watchPosts(posts => {
+    oForEach(posts, ([k, post]) => {
+      console.log(`${k}:`, post)
+      let postEl = document.createElement('div')
+      postEl.id = `post-${k}`
+      postEl.className = 'worldPost'
+      postEl.innerText = post.v
+      postEl.dataset.postionX = post.p[0]
+      postEl.dataset.postionY = post.p[1]
+      postsContainer.appendChild(postEl)
+    })
   })
 
-  return /* html */`
-      <div id="view-${key}">
-        ${key} : wait...
-      </div>
-  `
+
+  watchCamera(([x, y, z]) => {
+    requestAnimationFrame(() => {
+      postsContainer.childNodes.forEach((node) => {
+        const {postionX, postionY} = node.dataset
+        node.setAttribute('style', `transform: translate(${x}px, ${y}px); transition: all 0s;`)
+      })
+    })
+    // postsContainer = id('postsContainer')
+    // let postsContainerFrag = document.createDocumentFragment()
+    // postsContainerFrag = postsContainer.cloneNode(true)
+    // postsContainerFrag.childNodes.forEach((node) => {
+    //   const {postionX, postionY} = node.dataset
+    //   node.setAttribute('style', `transform: translate(${x}px, ${y}px); transition: all 0s;`)
+    // })
+    // postsContainer.replaceWith(postsContainerFrag)
+    // console.log([x, y, z])
+    // console.log(postsContainer.children)
+  })
+
+}
+
+const showPostHandler = (v) => {
+  console.log(v)
 }
 
 export const setPost = (posts) => {
-  arrayed(posts).forEach()
-  set
+  set((pre) => {
+    return {...pre, ...posts}
+  })
 }

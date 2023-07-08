@@ -3,7 +3,7 @@ import {style, pxToInt} from '../../../lib/theme'
 import {snippets as _} from '../../theme/snippets'
 import {shape} from '../../theme/shape'
 import {state} from '../../../lib/state'
-import {oForEach} from '../../../lib/util'
+import {postionAdapter} from './util'
 
 import CanvasWorker from '../../webgl/worker?worker'
 const canvasWorker = new CanvasWorker()
@@ -85,7 +85,7 @@ const watchResize = (canvasE) => {
 }
 
 const sendResize = () => {
-  const watch = state({key: 'canvasSize'})[0]
+  const [watch] = state({key: 'canvasSize'})
   watch(([width, height]) => sendState({resize: {width, height}}))
 }
 
@@ -147,8 +147,7 @@ const setPosition = (canvasWrapperE) => {
       const newZ = Math.max(z + (z * deltaY / 1500), 10)
       if (z === 10 && newZ === 10) return [x, y, z]
       const zoomIn = deltaY < 0 ? 1 : -1
-      const wx = 2 * (offsetX / canvasWrapperE.offsetWidth) - 1
-      const wy = - (2 * (offsetY / canvasWrapperE.offsetHeight) - 1)
+      const [wx, wy] = postionAdapter.pxToNormal(offsetX, offsetY)
       const diffX = z * coffX * wx * 0.05 * zoomIn
       const diffY = z * coffY * wy * 0.05 * zoomIn
       return [x + diffX, y + diffY, newZ]
@@ -193,8 +192,7 @@ const setPosition = (canvasWrapperE) => {
         const newZ = Math.max(z + (z * -zoom), 10)
         if (z === 10 && newZ === 10) return [x, y, z]
         const zoomIn = zoom > 0 ? 1 : -1
-        const wx = 2 * (((x1 + x2) / 2) / canvasWrapperE.offsetWidth) - 1
-        const wy = - (2 * (((((y1 + y2) / 2) - topBarHeight) / canvasWrapperE.offsetHeight)) - 1)
+        const [wx, wy] = postionAdapter.pxToNormal((x1 + x2) / 2, ((y1 + y2) / 2) - topBarHeight)
         const diffX = z * coffX * wx * 0.01 * zoomIn
         const diffY = z * coffY * wy * 0.01 * zoomIn
         return [x + diffX, y + diffY, newZ]
@@ -211,31 +209,31 @@ const setPosition = (canvasWrapperE) => {
 
 //----------------------------------------------------------------
 
-const sendKeydown = () => {
-  let keyDownList = {}
-  const send = (keyDownList) => sendState({keyDownList})
-  document.addEventListener('keydown', ({code}) => {
-    if(!keyDownList[code]) {
-      keyDownList[code] = true
-      send(keyDownList)
-    }
-  })
-  document.addEventListener('keyup', ({code}) => {
-    if(keyDownList[code]) {
-      keyDownList[code] = false
-      send(keyDownList)
-      delete keyDownList[code]
-    }
-  })
-}
+// const sendKeydown = () => {
+//   let keyDownList = {}
+//   const send = (keyDownList) => sendState({keyDownList})
+//   document.addEventListener('keydown', ({code}) => {
+//     if(!keyDownList[code]) {
+//       keyDownList[code] = true
+//       send(keyDownList)
+//     }
+//   })
+//   document.addEventListener('keyup', ({code}) => {
+//     if(keyDownList[code]) {
+//       keyDownList[code] = false
+//       send(keyDownList)
+//       delete keyDownList[code]
+//     }
+//   })
+// }
 
-const recieveState = () => {
-  const setterMap = {}
-  canvasWorker.onmessage = ({data}) => {
-    oForEach(data, ([k, v]) => {
-      setterMap[k] ??= state({key: k, init: v})[1]
-      setterMap[k](v)
-    })
-  }
-}
+// const recieveState = () => {
+//   const setterMap = {}
+//   canvasWorker.onmessage = ({data}) => {
+//     oForEach(data, ([k, v]) => {
+//       setterMap[k] ??= state({key: k, init: v})[1]
+//       setterMap[k](v)
+//     })
+//   }
+// }
 
