@@ -57,9 +57,10 @@ export const test = () => ({
       float grid3 = grid(currentP,100.,baseScale);
       float grid4 = grid(currentP,1000.,baseScale);
 
+      float point = 10. / (pow(baseScale, 2.) * length(m - p));
       float point2 = baseScale * 5. / (pow(baseScale, 2.) * length(lightPos - currentP));
 
-      float sum = grid4+grid3+grid2+grid1+point2;
+      float sum = grid4+grid3+grid2+grid1+point+point2;
       outColor = vec4(vec3(sum+base), 0.5);
     }`,
 

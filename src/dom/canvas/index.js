@@ -20,6 +20,7 @@ export function canvas() {
   })
 
   style.set('#canvasWrapper', wrapperC)
+  style.set('#canvasWrapper:active', wrapperActiveC)
   style.set('#canvas', canvasC)
   style.set('#canvasCover', coverC)
 
@@ -37,6 +38,10 @@ const wrapperC = {
   ..._.bgC({type: 'gray', i: 0}),
   ..._.rlt,
   ..._.wh100,
+}
+
+const wrapperActiveC = {
+  cursor: 'move'
 }
 
 const canvasC = {
@@ -190,16 +195,8 @@ const setPosition = (canvasWrapperE) => {
         const zoomIn = zoom > 0 ? 1 : -1
         const wx = 2 * (((x1 + x2) / 2) / canvasWrapperE.offsetWidth) - 1
         const wy = - (2 * (((((y1 + y2) / 2) - topBarHeight) / canvasWrapperE.offsetHeight)) - 1)
-        console.log(`_$1 y1_${y1}`)
-        console.log(`_$2 y2_${y2}`)
-        console.log(`_$3 wy_${wy}`)
-        console.log(`_$4 topBarHeight_${topBarHeight}`)
-
         const diffX = z * coffX * wx * 0.01 * zoomIn
         const diffY = z * coffY * wy * 0.01 * zoomIn
-
-        console.log(`_$5 diffY_${diffY}`)
-
         return [x + diffX, y + diffY, newZ]
       })
     }
