@@ -4,10 +4,13 @@ import {snippets as _} from '../../theme/snippets'
 import {shape} from '../../theme/shape'
 import {state} from '../../../lib/state'
 import {postionAdapter} from './util'
+import {getCamera, setCamera} from '../../core'
 
 import CanvasWorker from '../../webgl/worker?worker'
 const canvasWorker = new CanvasWorker()
+
 export const sendState = (object) => canvasWorker.postMessage({state: object})
+export const [watchCanvasSize, setCanvasSize, getCanvasSize] = state({key: 'canvasSize', init: [100, 100]})
 
 export function canvas() {
 
@@ -37,7 +40,7 @@ export function canvas() {
 const wrapperC = {
   ..._.bgC({type: 'gray', i: 0}),
   ..._.rlt,
-  ..._.wh100,
+  ..._.wh100
 }
 
 const wrapperActiveC = {
@@ -46,7 +49,7 @@ const wrapperActiveC = {
 
 const canvasC = {
   ..._.abs,
-  ..._.wh100,
+  ..._.wh100
 }
 
 const coverC = {
@@ -55,7 +58,7 @@ const coverC = {
   overflow : 'hidden',
   boxShadow: `
   inset 0 0 100px rgba(0, 0, 0, 0.6),
-  inset 0 0 200px rgba(0, 0, 0, 0.4);`,
+  inset 0 0 200px rgba(0, 0, 0, 0.4);`
 }
 
 //----------------------------------------------------------------
@@ -77,24 +80,22 @@ const init = () => {
 }
 
 const watchResize = (canvasE) => {
-  const set = state({key: 'canvasSize'})[1]
   const resizeObserver = new ResizeObserver((entries) => {
     const {width, height} = entries[0].contentRect
-    set([width, height])
+    setCanvasSize([width, height])
   })
   resizeObserver.observe(canvasE)
 }
 
 const sendResize = () => {
-  const [watch] = state({key: 'canvasSize'})
-  watch(([width, height]) => sendState({resize: {width, height}}))
+  watchCanvasSize(([width, height]) => sendState({resize: {width, height}}))
 }
 
 const sendMouse = (canvasWrapperE) => {
 
-  canvasWrapperE._on.mousemove = (e) => {
-    const x = 2 * (e.offsetX / canvasWrapperE.offsetWidth) - 1
-    const y = - (2 * (e.offsetY / canvasWrapperE.offsetHeight) - 1)
+  canvasWrapperE._on.mousemove = (event) => {
+    const x = 2 * (event.offsetX / canvasWrapperE.offsetWidth) - 1
+    const y = - (2 * (event.offsetY / canvasWrapperE.offsetHeight) - 1)
     sendState({mouse: {x, y}})
   }
 
@@ -105,8 +106,6 @@ const sendMouse = (canvasWrapperE) => {
 }
 
 const setPosition = (canvasWrapperE) => {
-  const [, set, get] = state({key: 'cameraPosition', init: [0, 0, 10]})
-  const [watchCanvasSize,, getCanvasSize] = state({key: 'canvasSize'})
 
   let start = null
   let startCamera = null
@@ -127,24 +126,22 @@ const setPosition = (canvasWrapperE) => {
 
   canvasWrapperE._on.mousedown = (event) => {
     const {clientX, clientY} = event
-    event.preventDefault()
     start ??= [clientX, clientY]
   }
 
   canvasWrapperE._on.mousemove = (event) => {
     const {clientX, clientY} = event
-    event.preventDefault()
     if (start) {
-      startCamera ??= get()
+      startCamera ??= getCamera()
       const diffX = - coffX * (clientX - start[0]) / width
       const diffY = coffY * (clientY - start[1]) / height
-      set(([, , z]) => [(startCamera[0] + z * diffX), (startCamera[1] + z * diffY), z])
+      setCamera(([, , z]) => [(startCamera[0] + z * diffX), (startCamera[1] + z * diffY), z])
     }
   }
 
   canvasWrapperE._on.wheel = (event) => {
     const {offsetX, offsetY, deltaY} = event // ToDo: postと重なっているときの対応
-    set(([x, y, z]) => {
+    setCamera(([x, y, z]) => {
       const newZ = Math.max(z + (z * deltaY / 1500), 1)
       if (z === 1 && newZ === 1) return [x, y, z]
       const zoomIn = deltaY < 0 ? 1 : -1
@@ -165,23 +162,21 @@ const setPosition = (canvasWrapperE) => {
   let isPinch = null
 
   canvasWrapperE._on.touchstart = (event) => {
-    event.preventDefault()
     const {changedTouches} = event
     const [{clientX, clientY}] = changedTouches
     start ??= [clientX, clientY]
   }
 
   canvasWrapperE._on.touchmove = (event) => {
-    event.preventDefault()
     const {changedTouches, touches} = event
     isPinch = isPinch || touches.length > 1
 
     if (start && !isPinch) {
       const [{clientX, clientY}] = changedTouches
-      startCamera ??= get()
+      startCamera ??= getCamera()
       const diffX = - coffX * (clientX - start[0]) / width
       const diffY = coffY * (clientY - start[1]) / height
-      set(([, , z]) => [(startCamera[0] + z * diffX), (startCamera[1] + z * diffY), z])
+      setCamera(([, , z]) => [(startCamera[0] + z * diffX), (startCamera[1] + z * diffY), z])
     }
 
     if (start && isPinch) {
@@ -189,7 +184,7 @@ const setPosition = (canvasWrapperE) => {
       const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
       baseDistance ??= distance
       const zoom = 0.15 * ((distance / baseDistance) - 1)
-      set(([x, y, z]) => {
+      setCamera(([x, y, z]) => {
         const newZ = Math.max(z + (z * -zoom), 1)
         if (z === 1 && newZ === 1) return [x, y, z]
         const zoomIn = zoom > 0 ? 1 : -1
@@ -201,8 +196,7 @@ const setPosition = (canvasWrapperE) => {
     }
   }
 
-  canvasWrapperE._on.touchend = (event) => {
-    event.preventDefault()
+  canvasWrapperE._on.touchend = () => {
     start = startCamera = baseDistance = isPinch = null
   }
 

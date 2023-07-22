@@ -22,10 +22,8 @@ export const test = () => ({
     }
 
     float grid(vec2 p, float unit, float scale){
-
       float unitLog = log10(unit);
       float scaleLog = log10(scale);
-
       float gridPower = max((2.+unitLog-scaleLog)*.5, .0);
       float gridV = smoothstep(1.-(scale*.004/unit), 1., abs(2./unit*mod(p.x,unit)-1.));
       float gridH = smoothstep(1.-(scale*.004/unit), 1., abs(2./unit*mod(p.y,unit)-1.));

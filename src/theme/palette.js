@@ -12,7 +12,7 @@ export const palette = {
     3: '#404040',
   },
   primary: {
-    '-1': '#ccccff',
+    '-1': '#bbbbff',
     0   : '#9999ff',
     1   : '#6666bb',
     2   : '#555599',

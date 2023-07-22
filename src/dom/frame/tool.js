@@ -1,15 +1,13 @@
 import {id} from '../../../lib/dom'
-import {state} from '../../../lib/state'
 import {style, icon} from '../../../lib/theme'
 import {snippets as _} from '../../theme/snippets'
-
+import {setIsOpenSidebar} from './frame'
 
 export function tool(content = '') {
 
   queueMicrotask(() => {
     const menuButtonE = id('menu-button')
-    const set = state({key: 'isOpenSidebar'})[1]
-    menuButtonE._on.click = () => set((v) => !v)
+    menuButtonE._on.click = () => setIsOpenSidebar((v) => !v)
   })
 
   style.set('#toolbar', toolBarC)
@@ -31,11 +29,12 @@ export function tool(content = '') {
 
 const toolBarC = {
   ..._.bgC({i: 3}),
-  ..._.px('12px'),
+  ..._.px('8px'),
   ..._.flex({align: 'center', justify: 'space-between'}),
   ..._.minH('var(--topbar-height)'),
-  zIndex      : 1100,
-  borderBottom: '1px solid var(--backgorund2)',
+  contain: 'strict',
+  zIndex : 1100,
+  // borderBottom: `3px solid ${_.getColor('background', 3, 0.8)}`,
 }
 
 const menuButtonC = {

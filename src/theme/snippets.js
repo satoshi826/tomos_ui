@@ -25,8 +25,8 @@ export const snippets = {
   maxH  : (h) => ({maxHeight: h}),
   wh    : (wh) => ({height: wh, width: wh}),
   bRd   : (br) => ({borderRadius: br}),
-  transX: (x) => ({transform: `translateX(${x})`}),
-  transY: (y) => ({transform: `translateY(${y})`}),
+  transX: (x) => ({transform: `translate3D(${x}, 0px, 0px)`}),
+  transY: (y) => ({transform: `translate3D(0px, ${y}, 0px)`}),
   trans : ({x, y}) => ({transform: `translate(${x}, ${y})`}),
   h100  : {height: '100%'},
   w100  : {width: '100%'},
@@ -52,17 +52,37 @@ export const snippets = {
   breakWord: {
     wordWrap: 'break-word'
   },
-  bgC: ({type = 'background', i = 0, val, alpha} = {}) => {
+  bgC({type = 'background', i = 0, val, alpha} = {}) {
     if(val) return {backgroundColor: val}
-    if(alpha) return {backgroundColor: `rgba(var(--${type}${i}-rgb),${alpha})`}
-    return {backgroundColor: `var(--${type}${i})`}
+    return {backgroundColor: this.getColor(type, i, alpha)}
   },
-  txC: ({type = 'text', i = 0, val, alpha} = {}) => {
+  txC({type = 'text', i = 0, val, alpha} = {}) {
     if(val) return {color: val}
-    if(alpha) return {color: `rgba(var(--${type}${i}-rgb),${alpha})`}
-    return {color: `var(--${type}${i})`}
+    return {color: this.getColor(type, i, alpha)}
   },
-  txGrow: (size) => ({
-    textShadow: `0 0 ${size / 2}px var(--primary${-1}),0 0 ${size}px var(--primary${1}),0 0 ${size * 1.5}px var(--primary${2})`,
-  })
+  txGrow(size) {
+    return{textShadow: `
+      0 0 ${size / 2}px ${this.getColor('primary', -1, 0.8)},
+      0 0 ${size * 2}px ${this.getColor('primary', 0, 0.8)},
+      0 0 ${size * 4}px ${this.getColor('primary', 1, 0.8)},
+      0 0 ${size * 6}px ${this.getColor('primary', 2, 0.8)}
+    `,
+    }
+  },
+  bgGrow(size = 2) {
+    return{boxShadow: `
+      0 0 ${size / 2}px 0px  ${this.getColor('primary', -1, 0.8)},
+      0 0 ${size * 2}px 0px  ${this.getColor('primary', 0, 0.8)},
+      0 0 ${size * 4}px 0px  ${this.getColor('primary', 1, 0.8)},
+      0 0 ${size * 8}px 0px  ${this.getColor('primary', 2, 0.8)}
+  `}
+  },
+  bgBlur(size = 2) {
+    return{boxShadow: `
+      0 0 ${size / 2}px 0px  ${this.getColor('background', 0, 0.8)},
+      0 0 ${size}px 0px  ${this.getColor('background', 0, 0.8)},
+      0 0 ${size * 2}px 0px  ${this.getColor('background', 1, 0.8)}
+  `}
+  },
+  getColor: (type, i, alpha) => alpha ? `rgba(var(--${type}${i}-rgb),${alpha})` : `var(--${type}${i})`
 }

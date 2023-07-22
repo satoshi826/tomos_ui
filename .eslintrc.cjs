@@ -2,7 +2,7 @@
 module.exports = {
   env: {
     browser: true,
-    es2022 : true,
+    es2022 : true
   },
   extends      : 'eslint:recommended',
   parserOptions: {
@@ -11,7 +11,7 @@ module.exports = {
   },
   globals: {
     html     : 'readonly',
-    scheduler: 'readonly',
+    scheduler: 'readonly'
   },
   rules: {
     indent                       : [2, 2],
@@ -32,6 +32,7 @@ module.exports = {
     'brace-style'                : 2,
     'array-bracket-spacing'      : [2, 'never'],
     'object-curly-spacing'       : [2, 'never'],
+    'comma-dangle'               : [2, 'never'],
     'comma-spacing'              : [2, {before: false, after: true}],
     'key-spacing'                : [2, {mode: 'strict', align: 'colon'}],
     'arrow-spacing'              : 2,
@@ -40,6 +41,6 @@ module.exports = {
     'space-infix-ops'            : 2,
     'space-in-parens'            : 2,
     'space-before-blocks'        : 2,
-    'space-before-function-paren': [2, 'never'],
-  },
+    'space-before-function-paren': [2, 'never']
+  }
 }

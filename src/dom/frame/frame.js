@@ -2,11 +2,14 @@ import {state} from '../../../lib/state'
 import {style} from '../../../lib/theme'
 import {snippets as _} from '../../theme/snippets'
 
+export const [watchIsOpenSidebar, setIsOpenSidebar, getIsOpenSidebar] = state({key: 'isOpenSidebar', init: true})
+
 export function frame({top = '', side = '', content = '', bottom = ''}) {
 
+  setIsOpenSidebar(!style.isDevice('mobile'))
+
   queueMicrotask(() => {
-    const watch = state({key: 'isOpenSidebar', init: !style.isDevice('mobile')})[0]
-    watch((isOpen) => {
+    watchIsOpenSidebar((isOpen) => {
       style.set('#frame-inner2', isOpen ? inner2C : closedInner2C)
     })
   })
@@ -35,6 +38,7 @@ const outerC = {
   ..._.wh('100%'),
   ..._.maxH('100%'),
   overflow: 'hidden',
+  contain : 'strict'
 }
 
 const innerC = {
@@ -46,8 +50,8 @@ const innerC = {
 const inner2C = {
   ..._.flex({col: true}),
   ..._.h('100%'),
-  ..._.dur('0.35s'),
-  ..._.minW('calc(100% - var(--sidebar-width))'),
+  ..._.dur('0.5s cubic-bezier(0.65, 0, 0.35, 1)'),
+  ..._.minW('calc(100% - var(--sidebar-width))')
 }
 
 const inner2CloseC = {

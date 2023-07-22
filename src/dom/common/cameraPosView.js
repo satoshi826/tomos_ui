@@ -17,21 +17,26 @@ export function cameraPosView() {
     })
   })
 
+  style.set('#cameraPos', cameraPosC)
+
   return /* html */`
-      <div>
-        <div id="cameraPosX" className="cameraPos">
+      <div id="cameraPos">
+        <div id="cameraPosX" >
         </div>
-        <div id="cameraPosY" className="cameraPos">
+        <div id="cameraPosY" >
         </div>
-        <div id="cameraPosZ" className="cameraPos">
+        <div id="cameraPosZ" >
         </div>
       </div>
   `
 }
 
 const cameraPosC = {
-  ..._.flex({col: true}),
-  ..._.wh('100%'),
-  ..._.maxH('100%'),
+  ..._.flex({col: false, gap: '10px'}),
+  ..._.h('36px'),
+  ..._.w('256px'),
+  ..._.f('16px'),
+  // ..._.maxH('100%'),
   overflow: 'hidden',
+  contain : 'strict'
 }

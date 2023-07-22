@@ -1,7 +1,6 @@
 import {id} from '../../../lib/dom'
 import {style, icon} from '../../../lib/theme'
 import {snippets as _} from '../../theme/snippets'
-
 import {toggleLog} from '../../debug/logger'
 
 export function nav() {
@@ -22,7 +21,9 @@ const navBarC = {
   ..._.px('12px'),
   ..._.flex({align: 'center', justify: 'space-around'}),
   ..._.minH('var(--navbar-height)'),
+  contain  : 'size layout',
   zIndex   : 1100,
+  ..._.rlt,
   borderTop: '1px solid var(--backgorund0)',
 }
 

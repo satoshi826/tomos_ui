@@ -1,7 +1,8 @@
-import {id} from '../../../lib/dom'
-import {state} from '../../../lib/state'
+import {id, addMultiEL, rmMultiEL} from '../../../lib/dom'
 import {style} from '../../../lib/theme'
 import {snippets as _} from '../../theme/snippets'
+import {watchIsOpenSidebar, setIsOpenSidebar} from './frame'
+import {deviceState} from '../../theme/init'
 
 export function side(content = 'sidebar') {
 
@@ -24,13 +25,14 @@ const sideBarC = {
   ..._.bgC({i: 2}),
   ..._.flex({col: true, align: 'center', gap: '20px'}),
   ..._.py('20px'),
-  ..._.dur('0.35s'),
+  ..._.dur('0.5s cubic-bezier(0.65, 0, 0.35, 1)'),
   ..._.minW('var(--sidebar-width)'),
   ..._.maxW('var(--sidebar-width)'),
   ..._.h100,
   ..._.rlt,
+  contain    : 'strict',
   zIndex     : 1100,
-  borderRight: '1.5px solid var(--background2)',
+  borderRight: `1px solid ${_.getColor('background', 3, 0.4)}`,
 }
 
 const closeC = _.transX('calc(-1 *var(--sidebar-width))')
@@ -38,7 +40,7 @@ const closeC = _.transX('calc(-1 *var(--sidebar-width))')
 const closedSideBarC = {...sideBarC, ...closeC}
 
 const sideBarMobileC = {
-  ..._.bgC({i: 3, alpha: 0.1}),
+  ..._.bgC({i: 3, alpha: 0.2}),
   backdropFilter: 'blur(4px) saturate(150%)',
 }
 
@@ -47,43 +49,34 @@ const sideBarMobileC = {
 const toggleSideber = () => {
   const sideBarE = id('sidebar')
   const menuButtonE = id('menu-button')
-  const [watchIsOpen, setIsOpen] = state({key: 'isOpenSidebar'})
-  const [watchIsMobile,, getIsMobile] = state({key: 'ismobile'})
+  const [watchIsMobile,, getIsMobile] = deviceState.mobile
 
   const closeSidebar = (e) => {
-    if ((!sideBarE.contains(e.target)) && (!menuButtonE.contains(e.target))) setIsOpen(false)
+    if ((!sideBarE.contains(e.target)) && (!menuButtonE.contains(e.target))) setIsOpenSidebar(false)
   }
 
-  watchIsOpen((isOpen) => {
+  watchIsOpenSidebar((isOpen) => {
     style.set('#sidebar', isOpen ? sideBarC : closedSideBarC)
-    document.removeEventListener('mousedown', closeSidebar)
-    document.removeEventListener('touchstart', closeSidebar)
-    if (isOpen && getIsMobile()) {
-      document.addEventListener('mousedown', closeSidebar)
-      document.addEventListener('touchstart', closeSidebar)
-    }
+    rmMultiEL(document, ['mousedown', 'touchstart'], closeSidebar)
+
+    if (isOpen && getIsMobile()) addMultiEL(document, ['mousedown', 'touchstart'], closeSidebar)
   })
 
   watchIsMobile((isMobile) => {
-    if(isMobile) {
-      document.addEventListener('mousedown', closeSidebar)
-      document.addEventListener('touchstart', closeSidebar)
-    } else{
-      document.removeEventListener('mousedown', closeSidebar)
-      document.removeEventListener('touchstart', closeSidebar)
-    }
+    if(isMobile) addMultiEL(document, ['mousedown', 'touchstart'], closeSidebar)
+    else rmMultiEL(document, ['mousedown', 'touchstart'], closeSidebar)
+
   })
 }
 
 const dragSideber = () => {
-  const watch = state({key: 'ismobile'})[0]
-  const set = state({key: 'isOpenSidebar'})[1]
+  const watchIsMobile = deviceState.mobile[0]
   const sideBarE = id('sidebar')
 
   let width = sideBarE.offsetWidth
   let start = null
   let now = null
-  watch((isMobile) => {
+  watchIsMobile((isMobile) => {
     if (!isMobile) {
       sideBarE.ontouchstart = null
       sideBarE.ontouchmove = null
@@ -95,7 +88,7 @@ const dragSideber = () => {
       now = clientX
       const position = Math.max(0, (start - now))
       sideBarE.setAttribute('style', `transform: translate3D(-${position}px,0px,0px); transition: all 0s;`)
-      if ((width / 2) < position) set(false)
+      if ((width / 2) < position) setIsOpenSidebar(false)
     }
     sideBarE.ontouchend = () => {
       start = null
