@@ -1,9 +1,10 @@
-// import {state} from '../../../../lib/state'
-// import {oForEach} from '../../../../lib/util'
+import {state} from '../../../../lib/state'
 import {style, icon} from '../../../../lib/theme'
 import {snippets as _} from '../../../theme/snippets'
-
 import {domContainerEl, getTranslate} from '../domContainer'
+import {postionAdapter} from '../../canvas/util'
+
+const [watchCamera] = state({key: 'cameraPosition'})
 
 export function postAction() {
 
@@ -13,6 +14,25 @@ export function postAction() {
         ${icon('maps_ugc', {size: '64px'})}
       </div>`
     domContainerEl.insertAdjacentHTML('beforeend', postHTML)
+
+    watchCamera((camera) => {
+
+      if (camera[2] < 10) {
+        const minX = camera[0] - camera[2] * postionAdapter.canvasAspect[0] / 2
+        const maxX = camera[0] + camera[2] * postionAdapter.canvasAspect[0] / 2
+        const minY = camera[1] - camera[2] * postionAdapter.canvasAspect[1] / 2
+        const maxY = camera[1] + camera[2] * postionAdapter.canvasAspect[1] / 2
+        let visiblePoints = []
+        for (let x = Math.trunc(minX); x < maxX; x++) {
+          for (let y = Math.trunc(minY); y < maxY; y++) {
+            visiblePoints.push([x, y])
+          }
+        }
+        console.log(visiblePoints)
+      }
+    })
+
+
   })
 
   style.set('.postAction', postActionC)

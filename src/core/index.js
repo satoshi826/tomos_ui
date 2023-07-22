@@ -9,16 +9,19 @@ export function core() {
   sendCameraPosition({init: [0, 0, 5]})
 
   const size = 20
-  let testMessage = aToO(range(size * size), (i) => [
-    `testId${i}`,
-    {
-      v: 'テストポスト' + i,
-      p: [(i % size), Math.floor(i / size)]
-    },
-  ])
+  let testMessage = aToO(range(size * size), (i) => {
+    const x = (i % size)
+    const y = Math.floor(i / size)
+    return [
+      `post${x}-${y}`,
+      {
+        v: 'テストポスト' + i,
+        p: [x, y]
+      },
+    ]
+  })
 
   console.log(testMessage)
-
   setPost(testMessage)
 }
 

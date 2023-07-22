@@ -7,8 +7,6 @@ import {postionAdapter} from '../../canvas/util'
 
 const [watchResize] = state({key: 'canvasSize'})
 const [watchCamera,, getCamera] = state({key: 'cameraPosition'})
-const [, setVisiblePoints,] = state({key: 'visiblePoints'})
-
 
 export const BASE_SCALE = 160
 export const domContainerEl = document.createElement('div')
@@ -58,7 +56,7 @@ export function domContainer() {
   let currentZ = Infinity
   const setContainer = (node, camera) => {
     const [tx, ty] = postionAdapter.worldToPx([0, 0], camera)
-    if(currentZ > camera[2]) {
+    if(currentZ !== camera[2]) {
       currentZ = camera[2]
       toggleWillChange()
     }

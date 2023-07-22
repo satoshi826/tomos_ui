@@ -45,9 +45,6 @@ export const postionAdapter = {
 watchResize(([width, height] = [1, 1]) => {
   postionAdapter.canvasWidht = width
   postionAdapter.canvasHeight = height
-  postionAdapter.canvasAspect = [
-    (width > height) ? width / height : 1,
-    (width > height) ? 1 : height / width
-  ]
+  postionAdapter.canvasAspect = (width > height) ? [width / height, 1] : [1, height / width]
   postionAdapter.canvasShortSide = Math.min(width, height)
 })
