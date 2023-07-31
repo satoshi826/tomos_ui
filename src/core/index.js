@@ -1,7 +1,7 @@
 import {state} from '../../lib/state'
 import {sendState} from '../dom/canvas'
 import {range, aToO} from '../../lib/util'
-import {infra} from '../infra'
+import {infra, getFetch} from '../infra'
 
 const initCamera = [0, 0, 5]
 export const [watchCamera, setCamera, getCamera] = state({key: 'cameraPosition', init: initCamera})
@@ -65,6 +65,22 @@ export function core() {
     })
     addPost(postsObj)
   })
+
+  setInterval(async() => {
+    const [x, y] = getCurrentTopic()
+    const posts = await getFetch({method: 'posts', key: `${x}.${y}`})
+    const postsObj = aToO(posts, (post) => {
+      const [t, x, y] = post['t.x.y'].split('.')
+      return [
+        `post${x}_${y}`,
+        {
+          'x.y': [x, y],
+          m    : post.m
+        }
+      ]
+    })
+    addPost(postsObj)
+  }, 5000)
 
   // const size = 2
   // let testMessage = aToO(range(size * size), (i) => {

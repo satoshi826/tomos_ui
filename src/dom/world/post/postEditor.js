@@ -3,6 +3,7 @@ import {beforeend, addMultiEL, rmMultiEL} from '../../../../lib/dom'
 import {style} from '../../../../lib/theme'
 import {snippets as _} from '../../../theme/snippets'
 import {addPost} from '../../../core'
+import {infra} from '../../../infra'
 import {divider} from '../../common/divider'
 
 import {watchEditPostMode, setEditPostMode, getEditPostMode} from '.'
@@ -32,6 +33,8 @@ export function postEditor() {
           'x.y': [x, y],
           m    : input.value
         }})
+      infra.post[`${x}.${y}`] = input.value
+      // infra.post[`${x}.${y}`]('yoyoyo')
       id(`post-button_${x}_${y}`).remove()
       setEditPostMode(false)
     }

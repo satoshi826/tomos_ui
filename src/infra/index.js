@@ -1,13 +1,14 @@
 import {cache} from './cashe'
 import {fetch} from './fetch'
 
-const getFetch = async({method, key}) => {
+export const getFetch = async({method, key}) => {
   const result = await fetch.get({method, key})
-  cache.set({method, key, value: result, timestamp: Date.now()})
+  const nowUNIx = Date.now()
+  cache.set({method, key, value: result, timestamp: nowUNIx})
   return result
 }
 
-export let infra = new Proxy({}, {
+const infraProxy = new Proxy({}, {
   get: function(_, method) {
     return new Proxy({}, {
       get: async function(_, key) {
@@ -15,12 +16,20 @@ export let infra = new Proxy({}, {
         // result ??= await indexDB.get({method, key})
         result ??= await getFetch({method, key})
         return result
+      },
+      set: async function(_, key, value) {
+        const result = await fetch.set({method, key, value})
+        cache.set({method, key, value})
+        return true
       }
+      // apply: function(target, thisArg, argumentsList) {
+      //   console.log(target, thisArg, argumentsList)
+      //   return true
+      // }
     })
   }
 })
-
-
+export let infra = infraProxy
 
 // export let infra = new Proxy({}, {
 //   // set: function(_, prop, f) {
