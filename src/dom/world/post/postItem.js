@@ -1,20 +1,25 @@
-import {beforeend} from '../../../../lib/dom'
+import {beforeend, id} from '../../../../lib/dom'
 import {oForEachV} from '../../../../lib/util'
 import {style} from '../../../../lib/theme'
 import {snippets as _} from '../../../theme/snippets'
 import {domContainerEl, getTranslate, BASE_SCALE} from '../domContainer'
 
-import {watchAddPosts} from '../../../core'
+import {watchAddPosts, getPost} from '../../../core'
 
 export function postItem() {
 
   requestAnimationFrame(() => {
     watchAddPosts(posts => {
-      oForEachV(posts, ({p: [x, y], v}) => {
-        //ToDo: templates使用
+      oForEachV(posts, ({'x.y': [x, y], m}) => {
+
+        if (id(`post_${x}_${y}`)) {
+          id(`post_${x}_${y}`).innerText = m
+          return
+        }
+
         const postHTML = /* html */`
           <div id="post_${x}_${y}" class="worldPost" data-x="${x}" data-y="${y}" style="transform:${getTranslate(x, y)}">
-            ${v}
+            ${m}
           </div>`
         beforeend(domContainerEl, postHTML)
       })
@@ -35,7 +40,7 @@ export function postItem() {
     textAlign           : 'center',
     contain             : 'strict',
     contentVisibility   : 'auto',
-    containIntrinsicSize: '16px',
+    containIntrinsicSize: '16px'
   })
 
   // style.set('.postVisible', {

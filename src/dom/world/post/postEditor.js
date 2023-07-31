@@ -29,8 +29,8 @@ export function postEditor() {
       const [x, y] = getEditPostMode()
       addPost({
         [`post${x}_${y}`]: {
-          v: input.value,
-          p: [x, y]
+          'x.y': [x, y],
+          m    : input.value
         }})
       id(`post-button_${x}_${y}`).remove()
       setEditPostMode(false)
@@ -84,22 +84,22 @@ const wrapperC = {
   top                    : '100%',
   animationIterationCount: '1',
   backdropFilter         : 'blur(16px) saturate(120%)',
-  borderTop              : `1px solid ${_.getColor('background', 3, 0.8)}`,
+  borderTop              : `1px solid ${_.getColor('background', 3, 0.8)}`
 }
 
 const editorFadein = {
   from: {
-    ..._.transY('0px'),
+    ..._.transY('0px')
   },
   to: {
-    ..._.transY(`${-editorSize}px`),
+    ..._.transY(`${-editorSize}px`)
 
   }
 }
 
 const editorFadeout = {
   ..._.dur('0.4s'),
-  ..._.transY('0px'),
+  ..._.transY('0px')
 }
 
 const flexC = {
@@ -108,7 +108,7 @@ const flexC = {
   ..._.px('24px'),
   ..._.flex({align: 'center', justify: 'center', gap: '16px', col: true}),
   borderRight: `0.2px solid ${_.getColor('text', 3, 0.3)}`,
-  borderLeft : `0.2px solid ${_.getColor('text', 3, 0.3)}`,
+  borderLeft : `0.2px solid ${_.getColor('text', 3, 0.3)}`
 }
 
 const inputC = {
@@ -121,13 +121,13 @@ const inputC = {
   boxShadow   : 'none',
   transition  : 'all .3s',
   flexGrow    : 1,
-  resize      : 'none',
+  resize      : 'none'
 }
 
 const inputFocusC = {
   outline     : 'none',
   borderBottom: `1px solid ${_.getColor('primary', 0)}`,
-  ..._.bgGrow(2),
+  ..._.bgGrow(2)
 }
 
 const buttonC = {
@@ -137,10 +137,10 @@ const buttonC = {
   ..._.bRd('8px'),
   ..._.px('16px'),
   fontWeight: 600,
-  cursor    : 'pointer',
+  cursor    : 'pointer'
 }
 
 const buttonHoverC = {
   ..._.bgC({type: 'primary', i: 0}),
-  ..._.bgGrow(3),
+  ..._.bgGrow(3)
 }

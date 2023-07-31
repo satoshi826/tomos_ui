@@ -1,6 +1,7 @@
 import {state} from '../../lib/state'
 import {sendState} from '../dom/canvas'
 import {range, aToO} from '../../lib/util'
+import {infra} from '../infra'
 
 const initCamera = [0, 0, 5]
 export const [watchCamera, setCamera, getCamera] = state({key: 'cameraPosition', init: initCamera})
@@ -27,7 +28,6 @@ export const delPost = (keys) => {
 
 export const getPost = (x, y) => getPosts()[`post${x}_${y}`]
 export const setPost = (v) => setPosts((pre) => ({...pre, ...v}))
-export const fetchPost = (x, y) => console.log('fetchPost', x, y)
 
 export function core() {
 
@@ -49,25 +49,37 @@ export function core() {
     }
   })
 
-  watchCurrentTopic(([x, y]) => {
-    fetchPost(x, y)
+  watchCurrentTopic(async(topic) => {
+    if (!topic) return
+    const [x, y] = topic
+    const posts = await infra.posts[`${x}.${y}`]
+    const postsObj = aToO(posts, (post) => {
+      const [t, x, y] = post['t.x.y'].split('.')
+      return [
+        `post${x}_${y}`,
+        {
+          'x.y': [x, y],
+          m    : post.m
+        }
+      ]
+    })
+    addPost(postsObj)
   })
 
-  const size = 2
-  let testMessage = aToO(range(size * size), (i) => {
-    const x = (i % size)
-    const y = Math.floor(i / size)
-    return [
-      `post${x}_${y}`,
-      {
-        v: 'テストポスト' + i,
-        p: [x, y]
-      }
-    ]
-  })
-
-  console.log(testMessage)
-  addPost(testMessage)
+  // const size = 2
+  // let testMessage = aToO(range(size * size), (i) => {
+  //   const x = (i % size)
+  //   const y = Math.floor(i / size)
+  //   return [
+  //     `post${x}_${y}`,
+  //     {
+  //       'x.y': [x, y],
+  //       m    : 'テストポスト' + i
+  //     }
+  //   ]
+  // })
+  // console.log(testMessage)
+  // addPost(testMessage)
 }
 
 //----------------------------------------------------------------
