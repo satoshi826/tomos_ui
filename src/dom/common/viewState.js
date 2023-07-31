@@ -3,7 +3,7 @@ import {id} from '../../../lib/dom'
 
 export function viewState({key, handler}) {
 
-  queueMicrotask(() => {
+  requestAnimationFrame(() => {
     const watch = state({key})[0]
     const viewE = id(`view-${key}`)
     watch((v) => viewE.innerText = key + ' : ' + handler ? handler(v) : v)

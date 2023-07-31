@@ -5,7 +5,7 @@ import {setIsOpenSidebar} from './frame'
 
 export function tool(content = '') {
 
-  queueMicrotask(() => {
+  requestAnimationFrame(() => {
     const menuButtonE = id('menu-button')
     menuButtonE._on.click = () => setIsOpenSidebar((v) => !v)
   })

@@ -8,7 +8,7 @@ import {watchAddPosts} from '../../../core'
 
 export function postItem() {
 
-  queueMicrotask(() => {
+  requestAnimationFrame(() => {
     watchAddPosts(posts => {
       oForEachV(posts, ({p: [x, y], v}) => {
         //ToDo: templates使用

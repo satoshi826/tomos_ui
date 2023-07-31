@@ -14,7 +14,7 @@ export const [watchCanvasSize, setCanvasSize, getCanvasSize] = state({key: 'canv
 
 export function canvas() {
 
-  queueMicrotask(() => {
+  requestAnimationFrame(() => {
     const {canvasE, canvasWrapperE} = init()
     watchResize(canvasE)
     sendResize()

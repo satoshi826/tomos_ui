@@ -9,7 +9,7 @@ import {watchEditPostMode, setEditPostMode, getEditPostMode} from '.'
 
 export function postEditor() {
 
-  queueMicrotask(() => {
+  requestAnimationFrame(() => {
     const navbarEl = id('navbar')
     const postEditor = /* html */`
     <div id="post-editor-wrapper">

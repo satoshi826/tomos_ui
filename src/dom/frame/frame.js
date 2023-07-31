@@ -8,7 +8,7 @@ export function frame({top = '', side = '', content = '', bottom = ''}) {
 
   setIsOpenSidebar(!style.isDevice('mobile'))
 
-  queueMicrotask(() => {
+  requestAnimationFrame(() => {
     watchIsOpenSidebar((isOpen) => {
       style.set('#frame-inner2', isOpen ? inner2C : closedInner2C)
     })

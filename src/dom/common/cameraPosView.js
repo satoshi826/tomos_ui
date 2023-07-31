@@ -5,7 +5,7 @@ import {snippets as _} from '../../theme/snippets'
 
 export function cameraPosView() {
 
-  queueMicrotask(() => {
+  requestAnimationFrame(() => {
     const [watch] = state({key: 'cameraPosition'})
     const posXE = id('cameraPosX')
     const posYE = id('cameraPosY')
