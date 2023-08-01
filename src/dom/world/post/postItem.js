@@ -32,7 +32,7 @@ export function postItem() {
     ..._.abs,
     ..._.wh(`${BASE_SCALE * 0.8}px`),
     ..._.f('12px'),
-    ..._.bgC({i: 0, alpha: 0.4}),
+    ..._.bgC({i: 2, alpha: 0.4}),
     ..._.bgBlur(4),
     ..._.bRd('50%'),
     ..._.flex({align: 'center', justify: 'center'}),

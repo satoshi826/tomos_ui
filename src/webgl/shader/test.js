@@ -9,11 +9,12 @@ export const test = () => ({
 
   frag: /* glsl */`#version 300 es
     precision highp float;
+    #define MAX_POSTS 1000
 
     uniform   vec2  resolution;
     uniform   vec2  mouse;
     uniform   vec3  cameraPosition;
-    uniform   vec2  lightPos;
+    uniform   vec2  lightPos[MAX_POSTS];
 
     out vec4 outColor;
 
@@ -49,7 +50,7 @@ export const test = () => ({
       vec2 currentP = (scale * .5 * p) + cameraPosition.xy;
 
       float grids = getGrids(currentP, scale);
-      float point = scale * 01. / (pow(scale, 2.) * length(lightPos - currentP));
+      float point = scale * 01. / (pow(scale, 2.) * length(lightPos[0] - currentP));
 
       float sum = grids+point;
       outColor = vec4(vec3(sum), 1.);

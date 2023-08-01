@@ -19,7 +19,7 @@ export async function main(core) {
     testF.set({mouse: [x, y]})
   })
 
-  testF.set({lightPos: [2, 2]})
+  testF.set({lightPos: [2, 2, 4, 4]})
 
   const animation = new Animation({callback: () => {
     renderer.render([testF])

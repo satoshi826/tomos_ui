@@ -24,7 +24,7 @@ const onClickPost = (x, y) => () => {
   easing(0, 1, 800, (v) => setCamera([
     cur[0] + (x - cur[0]) * v,
     cur[1] + (y - 0.5 - cur[1]) * v,
-    cur[2] + (2 - cur[2]) * v,
+    cur[2] + (2 - cur[2]) * v
   ]))
 }
 
@@ -101,7 +101,7 @@ const PostButtonC = {
   cursor              : 'pointer',
   contain             : 'strict',
   contentVisibility   : 'auto',
-  containIntrinsicSize: '0px',
+  containIntrinsicSize: '0px'
 }
 
 const postButtonFadein = {
@@ -112,20 +112,20 @@ const postButtonFadein = {
   },
   to: {
     ..._.txC({type: 'text', i: 0, alpha: 0.25}),
-    ..._.bgC({type: 'gray', i: 0, alpha: 0.25}),
+    ..._.bgC({type: 'gray', i: 0, alpha: 0.25})
   }
 }
 
 const postButtonFadeOut = {
   ..._.txC({type: 'text', i: 0, alpha: 0.001}),
-  ..._.bgC({type: 'gray', i: 0, alpha: 0.001}),
+  ..._.bgC({type: 'gray', i: 0, alpha: 0.001})
 }
 
 const PostButtonHoverC = {
   ..._.txC({type: 'primary', i: 0}),
   ..._.bgC({type: 'gray', i: 0, alpha: 0.7}),
   ..._.txGrow(10),
-  ..._.bgGrow(6),
+  ..._.bgGrow(6)
 }
 
 
