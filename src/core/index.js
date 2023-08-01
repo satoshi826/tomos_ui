@@ -66,23 +66,25 @@ export function core() {
     addPost(postsObj)
   })
 
-  setInterval(async() => {
-    const topic = getCurrentTopic()
-    if (!topic) return
-    const [x, y] = topic
-    const posts = await getFetch({method: 'posts', key: `${x}.${y}`})
-    const postsObj = aToO(posts, (post) => {
-      const [t, x, y] = post['t.x.y'].split('.')
-      return [
-        `post${x}_${y}`,
-        {
-          'x.y': [x, y],
-          m    : post.m
-        }
-      ]
+  setInterval(() => {
+    requestIdleCallback(async() => {
+      const topic = getCurrentTopic()
+      if (!topic) return
+      const [x, y] = topic
+      const posts = await getFetch({method: 'posts', key: `${x}.${y}`})
+      const postsObj = aToO(posts, (post) => {
+        const [t, x, y] = post['t.x.y'].split('.')
+        return [
+          `post${x}_${y}`,
+          {
+            'x.y': [x, y],
+            m    : post.m
+          }
+        ]
+      })
+      addPost(postsObj)
     })
-    addPost(postsObj)
-  }, 5000)// 人多い程更新頻度増やす？ tも有効に使う
+  }, 10000)// 人多い程更新頻度増やす？ tも有効に使う
 
   // const size = 2
   // let testMessage = aToO(range(size * size), (i) => {

@@ -11,10 +11,15 @@ export async function main(core) {
   const renderer = new Renderer(core)
 
   renderer.render([testF])
+
   setHandler('cameraPosition', (e) => testF.set({cameraPosition: e}))
+  setHandler('mouse', (mouse) => {
+    const x = mouse?.x ?? 0
+    const y = mouse?.y ?? 0
+    testF.set({mouse: [x, y]})
+  })
 
-  testF.set({lightPos: [5, 5]})
-
+  testF.set({lightPos: [2, 2]})
 
   const animation = new Animation({callback: () => {
     renderer.render([testF])

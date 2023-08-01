@@ -30,29 +30,35 @@ export const test = () => ({
       return .25*gridPower*(gridV+gridH);
     }
 
-    float getGrids(vec2 currentP, float scale){
-      float grid1 = grid(currentP,1.,scale);
-      float grid2 = grid(currentP,10.,scale);
-      float grid3 = grid(currentP,100.,scale);
-      float grid4 = grid(currentP,1000.,scale);
-      float grids = grid4+grid3+grid2+grid1;
-      return grids;
-    }
-
     void main(void){
+
+      float pi = acos(-1.);
 
       float aspect = resolution.x / resolution.y;
       vec2 a = (1.0 < aspect) ? vec2(aspect, 1.0) : vec2(1.0, 1.0 / aspect);
 
-      float scale = cameraPosition.z;
+      float baseScale = cameraPosition.z;
+
+      float baseLog = log10(baseScale);
+      float light = (.1-.01*baseLog);
+
+      vec3 base = vec3(light);
+
       vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
-      vec2 currentP = (scale * .5 * p) + cameraPosition.xy;
+      vec2 currentP = (baseScale * .5 * p) + cameraPosition.xy;
 
-      float grids = getGrids(currentP, scale);
-      float point = scale * 01. / (pow(scale, 2.) * length(lightPos - currentP));
+      vec2 m = vec2(a.x * mouse.x, a.y * mouse.y);
+      vec2 movedP = p + vec2(cameraPosition.x, cameraPosition.y);
 
-      float sum = grids+point;
-      outColor = vec4(vec3(sum), 1.);
+      float grid1 = grid(currentP,1.,baseScale);
+      float grid2 = grid(currentP,10.,baseScale);
+      float grid3 = grid(currentP,100.,baseScale);
+      float grid4 = grid(currentP,1000.,baseScale);
+
+      float point2 = baseScale * 01. / (pow(baseScale, 2.) * length(lightPos - currentP));
+
+      float sum = grid4+grid3+grid2+grid1+point2;
+      outColor = vec4(vec3(sum), 0.5);
     }`
 
 })
