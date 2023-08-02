@@ -47,14 +47,16 @@ export const test = () => ({
       vec2 a = (1.0 < aspect) ? vec2(aspect, 1.0) : vec2(1.0, 1.0 / aspect);
 
       float scale = cameraPosition.z;
+
       vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
       vec2 currentP = (scale * .5 * p) + cameraPosition.xy;
 
       float grids = getGrids(currentP, scale);
 
+      float scaleLog = log10(scale);
       float point = 0.;
       for(int i = 0; i < postNum; i++){
-        point += scale * 01. / (pow(scale, 2.) * length(postPos[i] - currentP));
+        point += .1 / (scaleLog * length(postPos[i] - currentP));
       }
 
       float sum = grids+point;
