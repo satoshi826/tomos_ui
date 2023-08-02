@@ -4,13 +4,17 @@ import {tool} from './tool'
 import {nav} from './nav'
 
 import {cameraPosView} from '../common/cameraPosView'
+import {viewState} from '../common/viewState'
 
-export default function({content = '',}) {
+export default function({content = ''}) {
   return `
   ${frame({
-    top   : tool(cameraPosView()),
-    side  : side(),
+    top : tool(cameraPosView()),
+    side: side(
+      ` ${viewState({key: 'fps'})}
+        ${viewState({key: 'drawTime'})}`
+    ),
     content,
-    bottom: nav(),
+    bottom: nav()
   })}`
 }

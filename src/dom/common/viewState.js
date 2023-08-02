@@ -6,7 +6,8 @@ export function viewState({key, handler}) {
   requestAnimationFrame(() => {
     const watch = state({key})[0]
     const viewE = id(`view-${key}`)
-    watch((v) => viewE.innerText = key + ' : ' + handler ? handler(v) : v)
+    console.log(handler)
+    watch((v) => viewE.innerText = key + ' : ' + (handler ? handler(v) : v))
   })
 
   return /* html */`

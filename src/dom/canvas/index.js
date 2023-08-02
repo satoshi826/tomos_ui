@@ -3,6 +3,7 @@ import {style, pxToInt} from '../../../lib/theme'
 import {snippets as _} from '../../theme/snippets'
 import {shape} from '../../theme/shape'
 import {state} from '../../../lib/state'
+import {oForEach} from '../../../lib/util'
 import {postionAdapter} from './util'
 import {getCamera, setCamera} from '../../core'
 
@@ -20,6 +21,7 @@ export function canvas() {
     sendResize()
     sendMouse(canvasWrapperE)
     setPosition(canvasWrapperE)
+    recieveState()
   })
 
   style.set('#canvasWrapper', wrapperC)
@@ -222,13 +224,13 @@ const setPosition = (canvasWrapperE) => {
 //   })
 // }
 
-// const recieveState = () => {
-//   const setterMap = {}
-//   canvasWorker.onmessage = ({data}) => {
-//     oForEach(data, ([k, v]) => {
-//       setterMap[k] ??= state({key: k, init: v})[1]
-//       setterMap[k](v)
-//     })
-//   }
-// }
+const recieveState = () => {
+  const setterMap = {}
+  canvasWorker.onmessage = ({data}) => {
+    oForEach(data, ([k, v]) => {
+      setterMap[k] ??= state({key: k, init: v})[1]
+      setterMap[k](v)
+    })
+  }
+}
 
