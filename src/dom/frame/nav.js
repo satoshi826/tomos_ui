@@ -1,7 +1,7 @@
 import {id} from '../../../lib/dom'
 import {style, icon} from '../../../lib/theme'
 import {snippets as _} from '../../theme/snippets'
-import {toggleLog} from '../../debug/logger'
+import {toggleLog} from '../../debug/window'
 
 export function nav() {
 
@@ -24,7 +24,7 @@ const navBarC = {
   contain  : 'size layout',
   zIndex   : 1100,
   ..._.rlt,
-  borderTop: '1px solid var(--backgorund0)',
+  borderTop: '1px solid var(--backgorund0)'
 }
 
 const iconButton = ({name, handler}) => {

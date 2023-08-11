@@ -18,9 +18,10 @@ const loggerC = {
   ..._.w('240px'),
   ..._.h('220px'),
   ..._.abs,
-  zIndex: 1000,
-  ..._.bgC({type: 'gray', i: 0, alpha: 0.5}),
-  ..._.bRd('16px')
+  zIndex: 10000,
+  ..._.bgC({type: 'gray', i: 1, alpha: 0.4}),
+  ..._.bRd('16px'),
+  border: `1px solid ${_.getColor('background', 3, 0.4)}`
 }
 
 const loggerTextC = {

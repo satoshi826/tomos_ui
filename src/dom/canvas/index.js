@@ -3,7 +3,7 @@ import {style, pxToInt} from '../../../lib/theme'
 import {snippets as _} from '../../theme/snippets'
 import {shape} from '../../theme/shape'
 import {state} from '../../../lib/state'
-import {oForEach} from '../../../lib/util'
+import {oForEach, clamp} from '../../../lib/util'
 import {postionAdapter} from './util'
 import {getCamera, setCamera} from '../../core'
 
@@ -144,8 +144,8 @@ const setPosition = (canvasWrapperE) => {
   canvasWrapperE._on.wheel = (event) => {
     const {offsetX, offsetY, deltaY} = event // ToDo: postと重なっているときの対応
     setCamera(([x, y, z]) => {
-      const newZ = Math.max(z + (z * deltaY / 1500), 1)
-      if (z === 1 && newZ === 1) return [x, y, z]
+      const newZ = clamp(z + (z * deltaY / 1500), 1, 1000)
+      if (z === newZ && (newZ === 1 || newZ === 1000)) return [x, y, z]
       const zoomIn = deltaY < 0 ? 1 : -1
       const [wx, wy] = postionAdapter.pxToNormal(offsetX, offsetY)
       const diffX = z * coffX * wx * 0.025 * zoomIn
@@ -187,8 +187,8 @@ const setPosition = (canvasWrapperE) => {
       baseDistance ??= distance
       const zoom = 0.15 * ((distance / baseDistance) - 1)
       setCamera(([x, y, z]) => {
-        const newZ = Math.max(z + (z * -zoom), 1)
-        if (z === 1 && newZ === 1) return [x, y, z]
+        const newZ = clamp(z + (z * -zoom), 1, 1000)
+        if (z === newZ && (newZ === 1 || newZ === 1000)) return [x, y, z]
         const zoomIn = zoom > 0 ? 1 : -1
         const [wx, wy] = postionAdapter.pxToNormal((x1 + x2) / 2, ((y1 + y2) / 2) - topBarHeight)
         const diffX = z * coffX * wx * 0.01 * zoomIn
