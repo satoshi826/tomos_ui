@@ -1,19 +1,20 @@
 import {values} from '../../lib/util'
 import {Program} from '../../lib/glFrag/Program'
-import {Renderer} from '../../lib/glFrag/Renderer2'
+import {Renderer} from '../../lib/glFrag/Renderer'
 import {Animation} from '../../lib/glFrag/Animation'
 import {setHandler, sendState} from '../../lib/glFrag/state'
+import {getState} from '../../lib/glFrag/state'
 
-import {sample} from './shader/sample'
 import {grid} from './shader/grid'
 import {posts} from './shader/posts'
+import {post} from './shader/post'
 import {plane} from './shape'
 
 export async function main(core) {
 
-  const sampleP = new Program(core, sample())
   const gridP = new Program(core, grid())
   const postsP = new Program(core, posts())
+  const postP = new Program(core, post())
 
   const renderer = new Renderer(core)
 
@@ -26,18 +27,26 @@ export async function main(core) {
   })
 
   setHandler('cameraPosition', (cameraPosition) => {
-    [gridP, postsP].forEach(program => program.set({cameraPosition}))
+    [gridP, postsP, postP].forEach(async(program) => program.set({cameraPosition}))
   })
 
+  let postPos
+
   setHandler('posts', (posts) => {
-    const postPos = values(posts).flatMap(v => v['x.y'])
-    postsP.set({postPos, postNum: postPos.length / 2})
+    postPos = values(posts).map(v => v['x.y'])
+    postsP.set({postPos: postPos.flat(), postNum: postPos.length / 2})
   })
+
 
   const animation = new Animation({callback: () => {
     renderer.clear()
+
+    postPos.forEach((pos) => {
+      postP.set({postPos: pos})
+      renderer.render('plane', postP)
+    })
+
     renderer.render('plane', gridP)
-    renderer.render('plane', postsP)
   }, interval: 0})
 
   animation.start()
