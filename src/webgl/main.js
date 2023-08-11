@@ -11,6 +11,11 @@ import {plane} from './shape'
 
 export async function main(core) {
 
+  core.gl.enable(core.gl.BLEND)
+  core.gl.blendFunc(core.gl.ONE, core.gl.ONE)
+  core.gl.depthMask(false)
+  core.gl.colorMask(true, true, true, false)
+
   const gridP = new Program(core, grid())
   const postsP = new Program(core, posts())
   const postP = new Program(core, post())
