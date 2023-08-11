@@ -41,10 +41,10 @@ export async function main(core) {
   const animation = new Animation({callback: () => {
     renderer.clear()
 
-    // postPos.forEach((pos) => {
-    //   postP.set({postPos: pos})
-    //   renderer.render('plane', postP)
-    // })
+    postPos.forEach((pos) => {
+      postP.set({postPos: pos})
+      renderer.render('plane', postP)
+    })
 
     renderer.render('plane', gridP)
   }, interval: 0})
