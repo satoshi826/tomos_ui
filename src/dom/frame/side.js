@@ -41,7 +41,7 @@ const closedSideBarC = {...sideBarC, ...closeC}
 
 const sideBarMobileC = {
   ..._.bgC({i: 3, alpha: 0.2}),
-  backdropFilter: 'blur(4px) saturate(150%)'
+  backdropFilter: 'blur(16px) saturate(150%)'
 }
 
 //----------------------------------------------------------------
