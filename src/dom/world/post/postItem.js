@@ -8,23 +8,23 @@ import {watchAddPosts} from '../../../core'
 
 export function postItem() {
 
-  // requestAnimationFrame(() => {
-  //   watchAddPosts(posts => {
-  //     oForEachV(posts, ({'x.y': [x, y], m}) => {
+  requestAnimationFrame(() => {
+    watchAddPosts(posts => {
+      oForEachV(posts, ({'x.y': [x, y], m}) => {
 
-  //       if (id(`post_${x}_${y}`)) {
-  //         id(`post_${x}_${y}`).innerText = m
-  //         return
-  //       }
+        if (id(`post_${x}_${y}`)) {
+          id(`post_${x}_${y}`).innerText = m
+          return
+        }
 
-  //       const postHTML = /* html */`
-  //         <div id="post_${x}_${y}" class="worldPost" data-x="${x}" data-y="${y}" style="transform:${getTranslate(x, y)}">
-  //           ${m}
-  //         </div>`
-  //       beforeend(domContainerEl, postHTML)
-  //     })
-  //   })
-  // })
+        const postHTML = /* html */`
+          <div id="post_${x}_${y}" class="worldPost" data-x="${x}" data-y="${y}" style="transform:${getTranslate(x, y)}">
+            ${m}
+          </div>`
+        beforeend(domContainerEl, postHTML)
+      })
+    })
+  })
 
   //-------------------------------------------
 
