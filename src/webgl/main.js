@@ -10,7 +10,7 @@ import {post} from './shader/post'
 import {plane} from './shape'
 
 export async function main(core) {
-
+  core.gl.disable(core.gl.DEPTH_TEST)
   core.gl.enable(core.gl.BLEND)
   core.gl.blendFunc(core.gl.ONE, core.gl.ONE)
   core.gl.depthMask(false)
@@ -43,7 +43,7 @@ export async function main(core) {
 
 
   const animation = new Animation({callback: () => {
-    renderer.clear()
+    // renderer.clear()
 
     postPos.forEach((pos) => {
       postP.set({postPos: pos})
