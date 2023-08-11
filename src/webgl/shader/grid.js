@@ -1,23 +1,17 @@
-export const test = () => ({
+export const grid = () => ({
 
-  id: 'test',
+  id: 'grid',
 
   uniformTypes: {
     resolution    : 'vec2',
-    mouse         : 'vec2',
-    cameraPosition: 'vec3',
-    postPos       : 'vec2',
-    postNum       : 'int'
+    cameraPosition: 'vec3'
   },
 
   frag: /* glsl */`#version 300 es
     precision highp float;
 
     uniform   vec2  resolution;
-    uniform   vec2  mouse;
     uniform   vec3  cameraPosition;
-    uniform   vec2  postPos[100];
-    uniform   int  postNum;
 
     out vec4 outColor;
 
@@ -49,20 +43,12 @@ export const test = () => ({
       vec2 a = (1.0 < aspect) ? vec2(aspect, 1.0) : vec2(1.0, 1.0 / aspect);
 
       float scale = cameraPosition.z;
-
       vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
       vec2 currentP = (scale * .5 * p) + cameraPosition.xy;
 
       float grids = getGrids(currentP, scale);
 
-      float scaleLog = log10(scale);
-      float point = 0.;
-      for(int i = 0; i < postNum; i++){
-        point += .1 / (scaleLog * length(postPos[i] - currentP));
-      }
-
-      float sum = grids+point;
-      outColor = vec4(vec3(sum), 1.);
+      outColor = vec4(vec3(grids), 1.);
     }`
 
 })

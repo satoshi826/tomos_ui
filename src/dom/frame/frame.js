@@ -50,7 +50,7 @@ const innerC = {
 const inner2C = {
   ..._.flex({col: true}),
   ..._.h('100%'),
-  ..._.dur('0.5s cubic-bezier(0.65, 0, 0.35, 1)'),
+  ..._.dur('0.4s'),
   ..._.minW('calc(100% - var(--sidebar-width))')
 }
 

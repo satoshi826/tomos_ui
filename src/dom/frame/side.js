@@ -25,14 +25,14 @@ const sideBarC = {
   ..._.bgC({i: 2}),
   ..._.flex({col: true, align: 'center', gap: '20px'}),
   ..._.py('20px'),
-  ..._.dur('0.5s cubic-bezier(0.65, 0, 0.35, 1)'),
+  ..._.dur('0.4s'),
   ..._.minW('var(--sidebar-width)'),
   ..._.maxW('var(--sidebar-width)'),
   ..._.h100,
   ..._.rlt,
   contain    : 'strict',
   zIndex     : 1100,
-  borderRight: `1px solid ${_.getColor('background', 3, 0.4)}`,
+  borderRight: `1px solid ${_.getColor('background', 3, 0.4)}`
 }
 
 const closeC = _.transX('calc(-1 *var(--sidebar-width))')
@@ -41,7 +41,7 @@ const closedSideBarC = {...sideBarC, ...closeC}
 
 const sideBarMobileC = {
   ..._.bgC({i: 3, alpha: 0.2}),
-  backdropFilter: 'blur(4px) saturate(150%)',
+  backdropFilter: 'blur(4px) saturate(150%)'
 }
 
 //----------------------------------------------------------------
