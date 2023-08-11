@@ -3,7 +3,6 @@ import {Program} from '../../lib/glFrag/Program'
 import {Renderer} from '../../lib/glFrag/Renderer'
 import {Animation} from '../../lib/glFrag/Animation'
 import {setHandler, sendState} from '../../lib/glFrag/state'
-import {getState} from '../../lib/glFrag/state'
 
 import {grid} from './shader/grid'
 import {posts} from './shader/posts'
@@ -16,7 +15,7 @@ export async function main(core) {
   const postsP = new Program(core, posts())
   const postP = new Program(core, post())
 
-  const renderer = new Renderer(core)
+  const renderer = new Renderer(core, {pixelRatio: 0.5})
 
   const planeA = plane()
 
