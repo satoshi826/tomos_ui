@@ -21,10 +21,7 @@ export const post = () => ({
       float scale = cameraPosition.z;
       vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
       vec2 currentP = (scale * .5 * p) + cameraPosition.xy;
-      float point = .05 / (length(postPos - currentP));
-      // if (point < .004) {
-      //   discard;
-      // }
+      float point = .1 / (length(postPos - currentP));
       outColor = vec4(vec3(point), 1.);
     }`
 
