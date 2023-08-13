@@ -5,7 +5,7 @@ export const posts = () => ({
   uniformTypes: {
     resolution    : 'vec2',
     cameraPosition: 'vec3',
-    postPos       : 'vec2',
+    postPos       : 'ivec2',
     postNum       : 'int'
   },
 
@@ -14,7 +14,7 @@ export const posts = () => ({
 
     uniform   vec2  resolution;
     uniform   vec3  cameraPosition;
-    uniform   vec2  postPos[500];
+    uniform   ivec2  postPos[500];
     uniform   int  postNum;
 
     out vec4 outColor;
@@ -36,7 +36,7 @@ export const posts = () => ({
       float scaleLog = log10(scale);
       float point = 0.;
       for(int i = 0; i < postNum; i++){
-        point += .1 / (scaleLog * length(postPos[i] - currentP));
+        point += .1 / (scaleLog * length(vec2(postPos[i]) - currentP));
       }
       outColor = vec4(vec3(point), 1.);
     }`
