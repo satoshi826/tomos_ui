@@ -22,7 +22,7 @@ export async function main(core) {
   const postsP = new Program(core, posts())
   const postP = new Program(core, post())
 
-  const renderer = new Renderer(core)
+  const renderer = new Renderer(core, {pixelRatio: 1})
 
   const planeA = plane()
 
