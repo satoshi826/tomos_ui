@@ -14,7 +14,7 @@ export const posts = () => ({
 
     uniform   vec2  resolution;
     uniform   vec3  cameraPosition;
-    uniform   vec2  postPos[100];
+    uniform   vec2  postPos[500];
     uniform   int  postNum;
 
     out vec4 outColor;
