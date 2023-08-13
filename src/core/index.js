@@ -1,6 +1,6 @@
 import {state} from '../../lib/state'
 import {sendState} from '../dom/canvas'
-import {aToO} from '../../lib/util'
+import {aToO, range} from '../../lib/util'
 import {infra, getFetch} from '../infra'
 
 
@@ -38,13 +38,32 @@ export function core() {
     const [curX, curY] = getCurrentTopic() ?? [null, null]
     const [x, y, z] = cameraPosition
 
-    if (z > 10) {
+    if (z > 40) {
       if(curX !== null) setCurrentTopic(null)
       return
     }
 
     const X = 10 * (Math.trunc(x / 10) + Math.sign(x))
     const Y = 10 * (Math.trunc(y / 10) + Math.sign(y))
+
+    if (z > 10) {
+      const size = 4
+      let testMessage = aToO(range(size * size), (i) => {
+        const x = (i % size)
+        const y = Math.floor(i / size)
+        return [
+          `post${2 * x + X}_${2 * y + Y}`,
+          {
+            'x.y': [2 * x + X, 2 * y + Y],
+            m    : 'テストポスト' + i
+          }
+        ]
+      })
+      console.log(X, Y)
+      addPost(testMessage)
+      return
+    }
+
     if(X !== curX || Y !== curY) {
       setCurrentTopic([X, Y])
     }

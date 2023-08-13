@@ -33,7 +33,7 @@ export function domContainer() {
   style.set('#domContainer', {
     ..._.abs,
     zIndex : 1000,
-    contain: 'size layout',
+    contain: 'size layout'
   })
 
   style.set('.willChangeTransform', {
