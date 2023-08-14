@@ -1,13 +1,13 @@
 import {values} from '../../lib/util'
+import {Vao} from '../../lib/glFrag/Vao'
 import {Program} from '../../lib/glFrag/Program'
 import {Renderer} from '../../lib/glFrag/Renderer'
 import {Animation} from '../../lib/glFrag/Animation'
 import {setHandler, sendState} from '../../lib/glFrag/state'
-import {getState} from '../../lib/glFrag/state'
 
 import {grid} from './shader/grid'
 import {posts} from './shader/posts'
-import {post} from './shader/post'
+import {post} from './shader/post2'
 import {plane} from './shape'
 
 export async function main(core) {
@@ -18,19 +18,12 @@ export async function main(core) {
   core.gl.depthMask(false)
   core.gl.colorMask(true, true, true, false)
 
+  const planeVAO = new Vao(core, plane())
   const gridP = new Program(core, grid())
   const postsP = new Program(core, posts())
   const postP = new Program(core, post())
 
   const renderer = new Renderer(core, {pixelRatio: 1})
-
-  const planeA = plane()
-
-  core.setVao({
-    id        : 'plane',
-    index     : planeA.index,
-    attributes: {a_position: planeA.position}
-  })
 
   setHandler('cameraPosition', (cameraPosition) => {
     [gridP, postsP, postP].forEach(async(program) => program.set({cameraPosition}))
@@ -44,18 +37,13 @@ export async function main(core) {
     postsP.set({postPos: postPos.flat(), postNum: postPos.length / 2})
   })
 
-
   const animation = new Animation({callback: () => {
     renderer.clear()
-    
-    renderer.render('plane', gridP)
-
+    renderer.render(planeVAO, gridP)
     postPos.forEach((pos) => {
       postP.set({postPos: pos})
-      renderer.render('plane', postP)
+      renderer.render(planeVAO, postP)
     })
-
-
   }, interval: 0})
 
   animation.start()
