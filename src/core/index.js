@@ -59,7 +59,7 @@ export function core() {
           }
         ]
       })
-      console.log(X, Y)
+      // console.log(X, Y)
       addPost(testMessage)
       return
     }

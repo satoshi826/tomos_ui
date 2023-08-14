@@ -32,7 +32,6 @@ export async function main(core) {
   let postPos
 
   setHandler('posts', (posts) => {
-    console.log(posts)
     postPos = values(posts).map(v => v['x.y'])
     postsP.set({postPos: postPos.flat(), postNum: postPos.length / 2})
   })
