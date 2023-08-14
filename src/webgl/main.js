@@ -33,7 +33,7 @@ export async function main(core) {
   })
 
   setHandler('cameraPosition', (cameraPosition) => {
-    [gridP, postsP].forEach(async(program) => program.set({cameraPosition}))
+    [gridP, postsP, postP].forEach(async(program) => program.set({cameraPosition}))
   })
 
   let postPos
@@ -47,8 +47,15 @@ export async function main(core) {
 
   const animation = new Animation({callback: () => {
     renderer.clear()
+    
     renderer.render('plane', gridP)
-    renderer.render('plane', postsP)
+
+    postPos.forEach((pos) => {
+      postP.set({postPos: pos})
+      renderer.render('plane', postP)
+    })
+
+
   }, interval: 0})
 
   animation.start()
