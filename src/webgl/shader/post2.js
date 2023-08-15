@@ -18,13 +18,15 @@ export const post = () => ({
     out vec2 u_position;
     out vec2 u_textureCoord;
 
+    const float SCALE = 16.;
+
     void main(void){
-      float scale = cameraPosition.z/2.;
+      float zoom = cameraPosition.z/2.;
       float aspect = resolution.y / resolution.x;
       vec2 a = (1.0 < aspect) ? vec2(1.0, 1.0 / aspect) : vec2(aspect, 1.0);
       u_textureCoord = a_textureCoord;
       u_position = resolution;
-      gl_Position = vec4(a*(.5*a_position.xy - cameraPosition.xy + postPos)/scale, 1.0, 1.0);
+      gl_Position = vec4(a*(SCALE*a_position.xy - cameraPosition.xy + postPos)/zoom, 1.0, 1.0);
     }
   `,
 
@@ -37,7 +39,7 @@ export const post = () => ({
     void main(void){
       vec2 center = vec2(0.5, 0.5);
       vec2 p = u_textureCoord;
-      float point = .001 / pow((length(center - p)),4.);
+      float point = .00000005 / pow((length(center - p)),4.);
       outColor = vec4(vec3(point), 1.);
     }`
 

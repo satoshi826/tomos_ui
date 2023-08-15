@@ -12,8 +12,10 @@ export const grid = () => ({
 
     uniform   vec2  resolution;
     uniform   vec3  cameraPosition;
-
     out vec4 outColor;
+
+    const float GRID_POWER = 2.2;
+    const float GRID_WIDTH = .004;
 
     float log10(float x){
       return log2(x) / log2(10.0);
@@ -22,9 +24,9 @@ export const grid = () => ({
     float grid(vec2 p, float unit, float scale){
       float unitLog = log10(unit);
       float scaleLog = log10(scale);
-      float gridPower = max((2.+unitLog-scaleLog)*.25, .0);
-      float gridV = smoothstep(1.-(scale*.008/unit), 1., abs(2./unit*mod(p.x,unit)-1.));
-      float gridH = smoothstep(1.-(scale*.008/unit), 1., abs(2./unit*mod(p.y,unit)-1.));
+      float gridPower = max((GRID_POWER+unitLog-scaleLog)*.25, .0);
+      float gridV = smoothstep(1.-(scale*GRID_WIDTH/unit), 1., abs(2./unit*mod(p.x,unit)-1.));
+      float gridH = smoothstep(1.-(scale*GRID_WIDTH/unit), 1., abs(2./unit*mod(p.y,unit)-1.));
       return .25*gridPower*(gridV+gridH);
     }
 
