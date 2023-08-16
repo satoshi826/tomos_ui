@@ -6,7 +6,6 @@ import {Animation} from '../../lib/glFrag/Animation'
 import {setHandler, sendState} from '../../lib/glFrag/state'
 
 import {grid} from './shader/grid'
-import {posts} from './shader/posts'
 import {post} from './shader/post2'
 import {plane} from './shape'
 

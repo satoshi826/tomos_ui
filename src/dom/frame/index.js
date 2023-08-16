@@ -12,7 +12,8 @@ export default function({content = ''}) {
     top : tool(cameraPosView()),
     side: side(
       ` ${viewState({key: 'fps'})}
-        ${viewState({key: 'drawTime'})}`
+        ${viewState({key: 'drawTime'})}
+        ${viewState({key: 'worldPosts', handler: (v) => Object.keys(v).length})}`
     ),
     content,
     bottom: nav()
