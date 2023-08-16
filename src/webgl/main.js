@@ -20,20 +20,19 @@ export async function main(core) {
 
   const planeVAO = new Vao(core, plane())
   const gridP = new Program(core, grid())
-  const postsP = new Program(core, posts())
   const postP = new Program(core, post())
 
   const renderer = new Renderer(core, {pixelRatio: 1})
 
   setHandler('cameraPosition', (cameraPosition) => {
-    [gridP, postsP, postP].forEach(async(program) => program.set({cameraPosition}))
+    [gridP, postP].forEach(async(program) => program.set({cameraPosition}))
   })
 
   let postPos
 
   setHandler('posts', (posts) => {
     postPos = values(posts).map(v => v['x.y'])
-    postsP.set({postPos: postPos.flat(), postNum: postPos.length / 2})
+    // postsP.set({postPos: postPos.flat(), postNum: postPos.length / 2})
   })
 
   const animation = new Animation({callback: () => {
