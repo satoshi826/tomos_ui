@@ -15,7 +15,6 @@ export const post = () => ({
     uniform   vec2  resolution;
     uniform   vec3  cameraPosition;
     uniform   vec2  postPos;
-    out vec2 u_position;
     out vec2 u_textureCoord;
 
     const float SCALE = .5;
@@ -25,7 +24,6 @@ export const post = () => ({
       float aspect = resolution.y / resolution.x;
       vec2 a = (1.0 < aspect) ? vec2(1.0, 1.0 / aspect) : vec2(aspect, 1.0);
       u_textureCoord = a_textureCoord;
-      u_position = resolution;
       gl_Position = vec4(a*(SCALE*a_position.xy - cameraPosition.xy + postPos)/zoom, 1.0, 1.0);
     }
   `,
