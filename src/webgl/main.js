@@ -21,7 +21,8 @@ export async function main(core) {
   const postVAO = new Vao(core, {
     ...plane(),
     id                 : 'post',
-    instancedAttributes: post().instancedAttributes
+    instancedAttributes: post().instancedAttributes,
+    maxInstance        : 100000
   })
 
   const gridP = new Program(core, grid())
@@ -33,12 +34,9 @@ export async function main(core) {
     [gridP, postP].forEach(async(program) => program.set({cameraPosition}))
   })
 
-  let postPos
-
   setHandler('posts', (posts) => {
-    postPos = values(posts).flatMap(v => v['x.y'].map(v => Number(v)))
     postVAO.setInstancedValues({
-      a_instance_postPos: postPos
+      a_instance_postPos: posts
     })
   })
 

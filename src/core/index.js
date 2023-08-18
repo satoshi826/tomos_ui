@@ -1,6 +1,6 @@
 import {state} from '../../lib/state'
 import {sendState} from '../dom/canvas'
-import {aToO, range} from '../../lib/util'
+import {aToO, range, values} from '../../lib/util'
 import {infra, getFetch} from '../infra'
 
 
@@ -38,7 +38,8 @@ export function core() {
     const [curX, curY] = getCurrentTopic() ?? [null, null]
     const [x, y, z] = cameraPosition
 
-    if (z > 40) {
+
+    if (z > 400) {
       if(curX !== null) setCurrentTopic(null)
       return
     }
@@ -46,7 +47,7 @@ export function core() {
     const X = 10 * (Math.trunc(x / 10) + Math.sign(x))
     const Y = 10 * (Math.trunc(y / 10) + Math.sign(y))
 
-    if (z > 10) {
+    if (z > 20) {
       const size = 4
       let testMessage = aToO(range(size * size), (i) => {
         const x = (i % size)
@@ -59,7 +60,6 @@ export function core() {
           }
         ]
       })
-      // console.log(X, Y)
       addPost(testMessage)
       return
     }
@@ -87,7 +87,7 @@ export function core() {
   })
 
   watchPosts(async(posts) => {
-    sendState({posts})
+    sendState({posts: values(posts).flatMap(v => v['x.y'].map(v => Number(v)))})
   })
 
   setInterval(() => {
