@@ -4,17 +4,20 @@ export const post = () => ({
 
   uniformTypes: {
     resolution    : 'vec2',
-    cameraPosition: 'vec3',
-    postPos       : 'vec2'
+    cameraPosition: 'vec3'
   },
+
+  instancedAttributes: [
+    'a_instance_postPos'
+  ],
 
   vert: /* glsl */`#version 300 es
 
     layout(location = 0) in vec3 a_position;
     layout(location = 1) in vec2 a_textureCoord;
+    layout(location = 2) in vec2 a_instance_postPos;
     uniform   vec2  resolution;
     uniform   vec3  cameraPosition;
-    uniform   vec2  postPos;
     out vec2 o_textureCoord;
 
     const float SCALE = .5;
@@ -24,7 +27,7 @@ export const post = () => ({
       float aspect = resolution.y / resolution.x;
       vec2 a = (1.0 < aspect) ? vec2(1.0, 1.0 / aspect) : vec2(aspect, 1.0);
       o_textureCoord = a_textureCoord;
-      gl_Position = vec4(a*(SCALE*a_position.xy - cameraPosition.xy + postPos)/zoom, 1.0, 1.0);
+      gl_Position = vec4(a*(SCALE*a_position.xy - cameraPosition.xy + a_instance_postPos)/zoom, 1.0, 1.0);
     }
   `,
 

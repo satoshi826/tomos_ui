@@ -17,7 +17,13 @@ export async function main(core) {
   core.gl.depthMask(false)
   core.gl.colorMask(true, true, true, false)
 
-  const planeVAO = new Vao(core, plane())
+  const gridVAO = new Vao(core, {...plane(), id: 'grid'})
+  const postVAO = new Vao(core, {
+    ...plane(),
+    id                 : 'post',
+    instancedAttributes: post().instancedAttributes
+  })
+
   const gridP = new Program(core, grid())
   const postP = new Program(core, post())
 
@@ -30,17 +36,16 @@ export async function main(core) {
   let postPos
 
   setHandler('posts', (posts) => {
-    postPos = values(posts).map(v => v['x.y'])
-    // postsP.set({postPos: postPos.flat(), postNum: postPos.length / 2})
+    postPos = values(posts).flatMap(v => v['x.y'].map(v => Number(v)))
+    postVAO.setInstancedValues({
+      a_instance_postPos: postPos
+    })
   })
 
   const animation = new Animation({callback: () => {
     renderer.clear()
-    renderer.render(planeVAO, gridP)
-    postPos.forEach((pos) => {
-      postP.set({postPos: pos})
-      renderer.render(planeVAO, postP)
-    })
+    renderer.render(gridVAO, gridP)
+    renderer.render(postVAO, postP)
   }, interval: 0})
 
   animation.start()
