@@ -39,7 +39,7 @@ export function core() {
     const [x, y, z] = cameraPosition
 
 
-    if (z > 400) {
+    if (z > 30) {
       if(curX !== null) setCurrentTopic(null)
       return
     }
