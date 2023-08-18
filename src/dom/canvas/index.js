@@ -144,8 +144,8 @@ const setPosition = (canvasWrapperE) => {
   canvasWrapperE._on.wheel = (event) => {
     const {offsetX, offsetY, deltaY} = event // ToDo: postと重なっているときの対応
     setCamera(([x, y, z]) => {
-      const newZ = clamp(z + (z * deltaY / 1500), 1, 1000)
-      if (z === newZ && (newZ === 1 || newZ === 1000)) return [x, y, z]
+      const newZ = clamp(z + (z * deltaY / 1500), 1, 10000)
+      if (z === newZ && (newZ === 1 || newZ === 10000)) return [x, y, z]
       const zoomIn = deltaY < 0 ? 1 : -1
       const [wx, wy] = postionAdapter.pxToNormal(offsetX, offsetY)
       const diffX = z * coffX * wx * 0.025 * zoomIn
@@ -187,8 +187,8 @@ const setPosition = (canvasWrapperE) => {
       baseDistance ??= distance
       const zoom = 0.15 * ((distance / baseDistance) - 1)
       setCamera(([x, y, z]) => {
-        const newZ = clamp(z + (z * -zoom), 1, 1000)
-        if (z === newZ && (newZ === 1 || newZ === 1000)) return [x, y, z]
+        const newZ = clamp(z + (z * -zoom), 1, 10000)
+        if (z === newZ && (newZ === 1 || newZ === 10000)) return [x, y, z]
         const zoomIn = zoom > 0 ? 1 : -1
         const [wx, wy] = postionAdapter.pxToNormal((x1 + x2) / 2, ((y1 + y2) / 2) - topBarHeight)
         const diffX = z * coffX * wx * 0.01 * zoomIn

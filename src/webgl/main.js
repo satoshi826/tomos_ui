@@ -1,4 +1,3 @@
-import {values} from '../../lib/util'
 import {Vao} from '../../lib/glFrag/Vao'
 import {Program} from '../../lib/glFrag/Program'
 import {Renderer} from '../../lib/glFrag/Renderer'
