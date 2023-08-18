@@ -20,7 +20,7 @@ export const post = () => ({
     uniform   vec3  cameraPosition;
     out vec2 o_textureCoord;
 
-    const float SCALE = 10.;
+    const float SCALE = 5.;
 
     void main(void){
       float zoom = cameraPosition.z/2.;
@@ -41,7 +41,9 @@ export const post = () => ({
     void main(void){
       vec2 center = vec2(0.5, 0.5);
       vec2 p = o_textureCoord;
-      float point = .002 / (length(center - p));
+      // float point = .002 / (length(center - p));
+      float len = length(center - p);
+      float point = 10.*pow(1.-(len),100.) + .1*pow(1.-(len),10.);
       outColor = vec4(vec3(point), 1.);
     }`
 

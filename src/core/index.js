@@ -48,14 +48,14 @@ export function core() {
     const Y = 10 * (Math.trunc(y / 10) + Math.sign(y))
 
     if (z > 20) {
-      const size = 4
+      const size = 8
       let testMessage = aToO(range(size * size), (i) => {
         const x = (i % size)
         const y = Math.floor(i / size)
         return [
-          `post${2 * x + X}_${2 * y + Y}`,
+          `post${x + X}_${y + Y}`,
           {
-            'x.y': [2 * x + X, 2 * y + Y],
+            'x.y': [x + X, y + Y],
             m    : 'テストポスト' + i
           }
         ]
