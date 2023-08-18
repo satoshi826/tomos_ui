@@ -27,7 +27,9 @@ export async function main(core) {
   const gridP = new Program(core, grid())
   const postP = new Program(core, post())
 
-  const renderer = new Renderer(core, {pixelRatio: 0.5})
+  console.log(core.pixelRatio)
+
+  const renderer = new Renderer(core, {pixelRatio: (core.pixelRatio > 1) ? 0.5 : 1})
 
   setHandler('cameraPosition', (cameraPosition) => {
     [gridP, postP].forEach(async(program) => program.set({cameraPosition}))
