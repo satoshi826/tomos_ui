@@ -25,8 +25,10 @@ export async function main(core) {
   const gridP = new Program(core, grid())
   const postP = new Program(core, post())
 
+  const basePixelRatio = (core.pixelRatio > 2) ? 0.25 : (core.pixelRatio > 1) ? 0.5 : 1
+
   const gridRenderer = new Renderer(core, {frameBuffer: [rgba8]})
-  const postsRenderer = new Renderer(core, {frameBuffer: [rgba8], pixelRatio: core.pixelRatio * 0.25})
+  const postsRenderer = new Renderer(core, {frameBuffer: [rgba8], pixelRatio: basePixelRatio * 0.5})
   const renderer = new Renderer(core)
 
   const composeP = new Program(core, {...compose(),
