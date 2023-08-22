@@ -3,7 +3,6 @@ import {sendState} from '../dom/canvas'
 import {aToO, range, values} from '../../lib/util'
 import {infra, getFetch} from '../infra'
 
-
 const initCamera = [0, 0, 5]
 export const [watchCamera, setCamera, getCamera] = state({key: 'cameraPosition', init: initCamera})
 export const [watchCurrentTopic, setCurrentTopic, getCurrentTopic] = state({key: 'currentTopic', init: [0, 0]})
@@ -39,7 +38,7 @@ export function core() {
     const [x, y, z] = cameraPosition
 
 
-    if (z > 30) {
+    if (z > 300) {
       if(curX !== null) setCurrentTopic(null)
       return
     }

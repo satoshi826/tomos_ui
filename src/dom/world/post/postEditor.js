@@ -5,7 +5,6 @@ import {snippets as _} from '../../../theme/snippets'
 import {addPost} from '../../../core'
 import {infra} from '../../../infra'
 import {divider} from '../../common/divider'
-import {button} from '../../common/button'
 
 import {watchEditPostMode, setEditPostMode, getEditPostMode} from '.'
 

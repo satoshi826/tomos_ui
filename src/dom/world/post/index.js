@@ -7,7 +7,7 @@ import {postEditor} from './postEditor'
 export const [watchEditPostMode, setEditPostMode, getEditPostMode] = state({key: 'isEditPostMode', init: false})
 
 export function init() {
-  postItem()
+  // postItem()
   postButton()
   postEditor()
 }

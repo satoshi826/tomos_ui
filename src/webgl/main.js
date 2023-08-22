@@ -1,22 +1,19 @@
 import {Vao} from '../../lib/glFrag/Vao'
 import {Program} from '../../lib/glFrag/Program'
-import {Renderer} from '../../lib/glFrag/Renderer'
+import {Renderer, rgba8} from '../../lib/glFrag/Renderer'
 import {Animation} from '../../lib/glFrag/Animation'
 import {setHandler, sendState} from '../../lib/glFrag/state'
 
 import {grid} from './shader/grid'
-import {post} from './shader/post2'
+import {post} from './shader/post'
+import {compose} from './shader/compose'
 import {plane} from './shape'
 
 export async function main(core) {
 
-  core.gl.disable(core.gl.DEPTH_TEST)
-  core.gl.enable(core.gl.BLEND)
-  core.gl.blendFunc(core.gl.ONE, core.gl.ONE)
-  core.gl.depthMask(false)
-  core.gl.colorMask(true, true, true, false)
+  initGl(core.gl)
 
-  const gridVAO = new Vao(core, {...plane(), id: 'grid'})
+  const planeVAO = new Vao(core, {...plane()})
   const postVAO = new Vao(core, {
     ...plane(),
     id                 : 'post',
@@ -24,12 +21,19 @@ export async function main(core) {
     maxInstance        : 100000
   })
 
+
   const gridP = new Program(core, grid())
   const postP = new Program(core, post())
 
-  console.log(core.pixelRatio)
+  const gridRenderer = new Renderer(core, {frameBuffer: [rgba8]})
+  const postsRenderer = new Renderer(core, {frameBuffer: [rgba8], pixelRatio: core.pixelRatio * 0.25})
+  const renderer = new Renderer(core)
 
-  const renderer = new Renderer(core, {pixelRatio: (core.pixelRatio > 1) ? 0.5 : 1})
+  const composeP = new Program(core, {...compose(),
+    texture: {
+      u_gridTexture : gridRenderer.renderTexture[0],
+      u_postsTexture: postsRenderer.renderTexture[0]
+    }})
 
   setHandler('cameraPosition', (cameraPosition) => {
     [gridP, postP].forEach(async(program) => program.set({cameraPosition}))
@@ -42,9 +46,11 @@ export async function main(core) {
   })
 
   const animation = new Animation({callback: () => {
-    renderer.clear()
-    renderer.render(gridVAO, gridP)
-    renderer.render(postVAO, postP)
+    gridRenderer.clear()
+    gridRenderer.render(planeVAO, gridP)
+    postsRenderer.clear()
+    postsRenderer.render(postVAO, postP)
+    renderer.render(planeVAO, composeP)
   }, interval: 0})
 
   animation.start()
@@ -57,3 +63,11 @@ export async function main(core) {
 //   const y = mouse?.y ?? 0
 //   testF.set({mouse: [x, y]})
 // })
+
+const initGl = (gl) => {
+  gl.disable(gl.DEPTH_TEST)
+  gl.enable(gl.BLEND)
+  gl.blendFunc(gl.ONE, gl.ONE)
+  gl.depthMask(false)
+  gl.colorMask(true, true, true, false)
+}
