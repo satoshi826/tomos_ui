@@ -13,7 +13,7 @@ export async function main(core) {
 
   initGl(core.gl)
 
-  const planeVAO = new Vao(core, {...plane()})
+  const planeVAO = new Vao(core, plane())
   const postVAO = new Vao(core, {
     ...plane(),
     id                 : 'post',
