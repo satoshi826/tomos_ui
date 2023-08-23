@@ -1,6 +1,6 @@
 import {state} from '../../lib/state'
 import {sendState} from '../dom/canvas'
-import {aToO, range, values} from '../../lib/util'
+import {aToO, range, values, random} from '../../lib/util'
 import {infra, getFetch} from '../infra'
 
 const initCamera = [0, 0, 5]
@@ -55,7 +55,8 @@ export function core() {
           `post${x + X}_${y + Y}`,
           {
             'x.y': [x + X, y + Y],
-            m    : 'テストポスト' + i
+            m    : 'テストポスト' + i,
+            l    : Math.pow(10, random(-1, 4))
           }
         ]
       })
@@ -78,7 +79,8 @@ export function core() {
         `post${x}_${y}`,
         {
           'x.y': [x, y],
-          m    : post.m
+          m    : post.m,
+          l    : Math.pow(10, random(-1, 4))
         }
       ]
     })
@@ -86,7 +88,10 @@ export function core() {
   })
 
   watchPosts(async(posts) => {
-    sendState({posts: values(posts).flatMap(v => v['x.y'].map(v => Number(v)))})
+    sendState({
+      posts: values(posts).flatMap(v => v['x.y'].map(v => Number(v))),
+      lums : values(posts).flatMap(v => v.l)
+    })
   })
 
   setInterval(() => {

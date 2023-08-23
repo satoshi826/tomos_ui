@@ -27,7 +27,7 @@ export async function main(core) {
   const basePixelRatio = (core.pixelRatio > 1) ? 0.5 : 1
 
   const gridRenderer = new Renderer(core, {frameBuffer: [rgba8]})
-  const postsRenderer = new Renderer(core, {frameBuffer: [rgba8], pixelRatio: basePixelRatio * 0.5})
+  const postsRenderer = new Renderer(core, {frameBuffer: [rgba8], pixelRatio: basePixelRatio * 0.25})
   const renderer = new Renderer(core)
 
   const composeP = new Program(core, {...compose(),
@@ -43,6 +43,12 @@ export async function main(core) {
   setHandler('posts', (posts) => {
     postVAO.setInstancedValues({
       a_instance_postPosition: posts
+    })
+  })
+
+  setHandler('lums', (lums) => {
+    postVAO.setInstancedValues({
+      a_instance_postLuminance: lums
     })
   })
 

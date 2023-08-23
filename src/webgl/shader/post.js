@@ -17,18 +17,19 @@ export const post = () => ({
     layout(location = 0) in vec3 a_position;
     layout(location = 1) in vec2 a_textureCoord;
     layout(location = 2) in vec2 a_instance_postPosition;
+    layout(location = 3) in float a_instance_postLuminance;
     uniform   vec2  resolution;
     uniform   vec3  cameraPosition;
     out vec2 o_textureCoord;
-
-    const float SCALE = .5;
-
+    out float o_postLuminance;
     void main(void){
       float zoom = cameraPosition.z/2.;
       float aspect = resolution.y / resolution.x;
+      float scale = .05 * a_instance_postLuminance;
       vec2 a = (1.0 < aspect) ? vec2(1.0, 1.0 / aspect) : vec2(aspect, 1.0);
       o_textureCoord = a_textureCoord;
-      gl_Position = vec4(a*(SCALE*a_position.xy - cameraPosition.xy + a_instance_postPosition)/zoom, 1.0, 1.0);
+      o_postLuminance = a_instance_postLuminance;
+      gl_Position = vec4(a*(scale*a_position.xy - cameraPosition.xy + a_instance_postPosition)/zoom, 1.0, 1.0);
     }
   `,
 
@@ -36,6 +37,7 @@ export const post = () => ({
     precision highp float;
 
     in vec2 o_textureCoord;
+    in float o_postLuminance;
     out vec4 outColor;
 
     const vec2 CENTER = vec2(0.5, 0.5);
@@ -43,7 +45,7 @@ export const post = () => ({
     void main(void){
       float len = length(CENTER - o_textureCoord);
       // float point = 100.*pow(1.-(len),10.) + .1*pow(1.-(len),10.);
-      float point = 10.*pow(1.-(len),10.);
+      float point = 20.*pow(1.-(len),10.) / o_postLuminance;
       outColor = vec4(vec3(point), 1.);
     }`
 
