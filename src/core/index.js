@@ -38,7 +38,7 @@ export function core() {
     const [x, y, z] = cameraPosition
 
 
-    if (z > 300) {
+    if (z > 500) {
       if(curX !== null) setCurrentTopic(null)
       return
     }
@@ -46,7 +46,7 @@ export function core() {
     const X = 10 * (Math.trunc(x / 10) + Math.sign(x))
     const Y = 10 * (Math.trunc(y / 10) + Math.sign(y))
 
-    if (z > 20) {
+    if (z > 200) {
       const size = 8
       let testMessage = aToO(range(size * size), (i) => {
         const x = (i % size)
