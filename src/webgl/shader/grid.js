@@ -21,7 +21,7 @@ export const grid = () => ({
     uniform   vec3  cameraPosition;
     out vec4 outColor;
 
-    const float GRID_POWER = 2.2;
+    const float GRID_POWER = 2.0;
     const float GRID_WIDTH = .004;
 
     float log10(float x){
