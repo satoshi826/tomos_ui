@@ -45,7 +45,7 @@ export const post = () => ({
     void main(void){
       float len = length(CENTER - o_textureCoord);
       // float point = 100.*pow(1.-(len),10.) + .1*pow(1.-(len),10.);
-      float point = 10.*pow(1.-(len),10.) / o_postLuminance;
+      float point = 100.*pow(1.-(len),50.) / o_postLuminance;
       outColor = vec4(vec3(point), 1.);
     }`
 
