@@ -21,11 +21,10 @@ export async function main(core) {
     maxInstance        : 100000
   })
 
-
   const gridP = new Program(core, grid())
   const postP = new Program(core, post())
 
-  const basePixelRatio = (core.pixelRatio > 2) ? 0.25 : (core.pixelRatio > 1) ? 0.5 : 1
+  const basePixelRatio = (core.pixelRatio > 1) ? 0.5 : 1
 
   const gridRenderer = new Renderer(core, {frameBuffer: [rgba8]})
   const postsRenderer = new Renderer(core, {frameBuffer: [rgba8], pixelRatio: basePixelRatio * 0.5})
@@ -43,7 +42,7 @@ export async function main(core) {
 
   setHandler('posts', (posts) => {
     postVAO.setInstancedValues({
-      a_instance_postPos: posts
+      a_instance_postPosition: posts
     })
   })
 
