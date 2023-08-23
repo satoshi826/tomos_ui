@@ -28,7 +28,13 @@ export const compose = () => ({
     void main(void){
       vec3 gTex = texture(u_gridTexture, o_textureCoord).rgb;
       vec3 pTex = texture(u_postsTexture, o_textureCoord).rgb;
-      outColor = vec4(gTex+pTex, 1.);
+      vec3 mixed = gTex+pTex;
+      vec3 toneMapped = vec3(
+        mixed.r/(1.+mixed.r),
+        mixed.g/(1.+mixed.g),
+        mixed.b/(1.+mixed.b)
+      );
+      outColor = vec4(toneMapped, 1.);
     }`
 
 })

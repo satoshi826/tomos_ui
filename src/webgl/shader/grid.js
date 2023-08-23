@@ -50,13 +50,10 @@ export const grid = () => ({
 
       float aspect = resolution.x / resolution.y;
       vec2 a = (1.0 < aspect) ? vec2(aspect, 1.0) : vec2(1.0, 1.0 / aspect);
-
       float scale = cameraPosition.z;
       vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
       vec2 currentP = (scale * .5 * p) + cameraPosition.xy;
-
       float grids = getGrids(currentP, scale);
-
       outColor = vec4(vec3(grids), 1.);
     }`
 

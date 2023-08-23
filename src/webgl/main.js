@@ -1,6 +1,6 @@
 import {Vao} from '../../lib/glFrag/Vao'
 import {Program} from '../../lib/glFrag/Program'
-import {Renderer, rgba8} from '../../lib/glFrag/Renderer'
+import {Renderer, rgba16f} from '../../lib/glFrag/Renderer'
 import {Animation} from '../../lib/glFrag/Animation'
 import {setHandler, sendState} from '../../lib/glFrag/state'
 
@@ -26,8 +26,8 @@ export async function main(core) {
 
   const basePixelRatio = (core.pixelRatio > 1) ? 0.5 : 1
 
-  const gridRenderer = new Renderer(core, {frameBuffer: [rgba8]})
-  const postsRenderer = new Renderer(core, {frameBuffer: [rgba8], pixelRatio: basePixelRatio * 0.25})
+  const gridRenderer = new Renderer(core, {frameBuffer: [rgba16f]})
+  const postsRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio * 0.25})
   const renderer = new Renderer(core)
 
   const composeP = new Program(core, {...compose(),
@@ -77,4 +77,11 @@ const initGl = (gl) => {
   gl.blendFunc(gl.ONE, gl.ONE)
   gl.depthMask(false)
   gl.colorMask(true, true, true, false)
+  gl.getExtension('EXT_color_buffer_float')
+  gl.getExtension('EXT_float_blend')
+  gl.getExtension('OES_texture_half_float')
+  gl.getExtension('OES_texture_half_float_linear')
+  gl.getExtension('OES_texture_float')
+  gl.getExtension('OES_texture_float_linear')
+  gl.getExtension('WEBGL_color_buffer_float')
 }
