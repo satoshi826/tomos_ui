@@ -22,6 +22,7 @@ export const post = () => ({
     uniform   vec3  cameraPosition;
     out vec2 o_textureCoord;
     out float o_postLuminance;
+    out float o_scale;
 
     float logY(float y, float x){
       return log2(x) / log2(y);
@@ -30,10 +31,11 @@ export const post = () => ({
     void main(void){
       float zoom = cameraPosition.z/2.;
       float aspect = resolution.y / resolution.x;
-      float scale = .5;
+      float scale = .5 * logY(1.2,a_instance_postLuminance+1.2);
       vec2 a = (1.0 < aspect) ? vec2(1.0, 1.0 / aspect) : vec2(aspect, 1.0);
       o_textureCoord = a_textureCoord;
       o_postLuminance = a_instance_postLuminance;
+      o_scale = scale;
       gl_Position = vec4(a*(2.*scale*a_position.xy - cameraPosition.xy + a_instance_postPosition)/zoom, 1.0, 1.0);
     }
   `,
@@ -43,6 +45,7 @@ export const post = () => ({
 
     in vec2 o_textureCoord;
     in float o_postLuminance;
+    in float o_scale;
     out vec4 outColor;
 
     const vec2 CENTER = vec2(.5);
@@ -53,7 +56,12 @@ export const post = () => ({
 
     void main(void){
       float len = length(CENTER - o_textureCoord);
-      float point = o_postLuminance*(1.-smoothstep(.001, .25, len));
+      // float point = .05*log2(o_postLuminance+.5)*(1.-smoothstep(.25, .3, len));
+      float point =
+        // .001*o_postLuminance/(pow(len+1., 5.))+
+        .0001*logY(1.5,o_postLuminance+1.5)*(1.-smoothstep(.05, .5, len))+
+        1.*logY(1.5,o_postLuminance+1.5)*(1.-smoothstep(.125, .15, len*o_scale));
+
       outColor = vec4(vec3(point),1.);
     }`
 
