@@ -44,6 +44,7 @@ export const post = () => ({
     precision highp float;
 
     in vec2 o_textureCoord;
+    in vec2 o_textureCoord;
     in float o_postLuminance;
     in float o_scale;
     out vec4 outColor;
@@ -58,9 +59,8 @@ export const post = () => ({
       float len = length(CENTER - o_textureCoord);
       // float point = .05*log2(o_postLuminance+.5)*(1.-smoothstep(.25, .3, len));
       float point =
-        // .001*o_postLuminance/(pow(len+1., 5.))+
-        .0001*logY(1.5,o_postLuminance+1.5)*(1.-smoothstep(.05, .5, len))+
-        1.*logY(1.5,o_postLuminance+1.5)*(1.-smoothstep(.125, .15, len*o_scale));
+        .005*o_postLuminance/(pow(len+1., 20.))+
+        .1*logY(2.5,o_postLuminance+1.5)*(1.-smoothstep(.125, .15, len*o_scale));
 
       outColor = vec4(vec3(point),1.);
     }`
