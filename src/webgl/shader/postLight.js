@@ -1,6 +1,6 @@
-export const post = () => ({
+export const postLight = () => ({
 
-  id: 'post',
+  id: 'postLight',
 
   uniformTypes: {
     resolution    : 'vec2',
@@ -44,25 +44,16 @@ export const post = () => ({
     precision highp float;
 
     in vec2 o_textureCoord;
-    in vec2 o_textureCoord;
     in float o_postLuminance;
     in float o_scale;
     out vec4 outColor;
 
     const vec2 CENTER = vec2(.5);
 
-    float logY(float y, float x){
-      return log2(x) / log2(y);
-    }
-
     void main(void){
       float len = length(CENTER - o_textureCoord);
-      // float point = .05*log2(o_postLuminance+.5)*(1.-smoothstep(.25, .3, len));
-      float point =
-        .005*o_postLuminance/(pow(len+1., 20.))+
-        .1*logY(2.5,o_postLuminance+1.5)*(1.-smoothstep(.125, .15, len*o_scale));
-
-      outColor = vec4(vec3(point),1.);
+      float light = .0001*o_postLuminance/(pow(len+1., 20.));
+      outColor = vec4(vec3(light),1.);
     }`
 
 })

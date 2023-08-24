@@ -3,8 +3,9 @@ export const compose = () => ({
   id: 'compose',
 
   uniformTypes: {
-    u_gridTexture : 'int',
-    u_postsTexture: 'int'
+    u_gridTexture      : 'int',
+    u_postsTexture     : 'int',
+    u_postLightsTexture: 'int'
   },
 
   vert: /* glsl */`#version 300 es
@@ -22,13 +23,15 @@ export const compose = () => ({
     precision highp float;
     uniform sampler2D u_gridTexture;
     uniform sampler2D u_postsTexture;
+    uniform sampler2D u_postLightsTexture;
     in vec2 o_textureCoord;
     out vec4 outColor;
 
     void main(void){
       vec3 gTex = texture(u_gridTexture, o_textureCoord).rgb;
       vec3 pTex = texture(u_postsTexture, o_textureCoord).rgb;
-      vec3 mixed = gTex+pTex;
+      vec3 lTex = texture(u_postLightsTexture, o_textureCoord).rgb;
+      vec3 mixed = gTex+pTex+lTex;
       vec3 toneMapped = vec3(
         mixed.r/(1.+mixed.r),
         mixed.g/(1.+mixed.g),

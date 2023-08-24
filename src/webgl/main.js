@@ -6,6 +6,7 @@ import {setHandler, sendState} from '../../lib/glFrag/state'
 
 import {grid} from './shader/grid'
 import {post} from './shader/post'
+import {postLight} from './shader/postLight'
 import {compose} from './shader/compose'
 import {plane} from './shape'
 
@@ -18,26 +19,40 @@ export async function main(core) {
     ...plane(),
     id                 : 'post',
     instancedAttributes: post().instancedAttributes,
-    maxInstance        : 100000
+    maxInstance        : 50000
+  })
+
+  const postLightVAO = new Vao(core, {
+    ...plane(),
+    id                 : 'postlight',
+    instancedAttributes: postLight().instancedAttributes,
+    maxInstance        : 50000
   })
 
   const gridP = new Program(core, grid())
   const postP = new Program(core, post())
+  const postLightP = new Program(core, postLight())
 
   const basePixelRatio = ((core.pixelRatio > 1) ? 0.5 : 1) * core.pixelRatio
 
   const gridRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio})
   const postsRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio})
+  const postLightsRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio * 0.125})
+
   const renderer = new Renderer(core)
 
   const composeP = new Program(core, {...compose(),
     texture: {
-      u_gridTexture : gridRenderer.renderTexture[0],
-      u_postsTexture: postsRenderer.renderTexture[0]
+      u_gridTexture      : gridRenderer.renderTexture[0],
+      u_postsTexture     : postsRenderer.renderTexture[0],
+      u_postLightsTexture: postLightsRenderer.renderTexture[0]
     }})
 
+
+  console.log(composeP)
+
   setHandler('cameraPosition', (cameraPosition) => {
-    [gridP, postP].forEach(async(program) => program.set({cameraPosition}))
+    [gridP, postP, postLightP].forEach(async(program) => program.set({cameraPosition}))
   })
 
   setHandler('posts', (posts) => {
@@ -53,10 +68,16 @@ export async function main(core) {
   })
 
   const animation = new Animation({callback: () => {
+
     gridRenderer.clear()
     gridRenderer.render(planeVAO, gridP)
+
     postsRenderer.clear()
     postsRenderer.render(postVAO, postP)
+
+    postLightsRenderer.clear()
+    postLightsRenderer.render(postVAO, postLightP)
+
     renderer.render(planeVAO, composeP)
   }, interval: 0})
 
