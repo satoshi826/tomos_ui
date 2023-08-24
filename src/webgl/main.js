@@ -36,8 +36,8 @@ export async function main(core) {
   const basePixelRatio = ((core.pixelRatio > 1) ? 0.5 : 1) * core.pixelRatio
 
   const gridRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio})
-  const postsRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio})
-  const postLightsRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio * 0.125})
+  const postsRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio * 0.5})
+  const postLightsRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio * 0.0625})
 
   const renderer = new Renderer(core)
 
