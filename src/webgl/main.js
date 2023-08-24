@@ -22,12 +22,6 @@ export async function main(core) {
     maxInstance        : 50000
   })
 
-  const postLightVAO = new Vao(core, {
-    ...plane(),
-    id                 : 'postlight',
-    instancedAttributes: postLight().instancedAttributes,
-    maxInstance        : 50000
-  })
 
   const gridP = new Program(core, grid())
   const postP = new Program(core, post())
@@ -36,7 +30,7 @@ export async function main(core) {
   const basePixelRatio = ((core.pixelRatio > 1) ? 0.5 : 1) * core.pixelRatio
 
   const gridRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio})
-  const postsRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio * 0.5})
+  const postsRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio})
   const postLightsRenderer = new Renderer(core, {frameBuffer: [rgba16f], pixelRatio: basePixelRatio * 0.0625})
 
   const renderer = new Renderer(core)
@@ -47,9 +41,6 @@ export async function main(core) {
       u_postsTexture     : postsRenderer.renderTexture[0],
       u_postLightsTexture: postLightsRenderer.renderTexture[0]
     }})
-
-
-  console.log(composeP)
 
   setHandler('cameraPosition', (cameraPosition) => {
     [gridP, postP, postLightP].forEach(async(program) => program.set({cameraPosition}))
