@@ -5,7 +5,7 @@ export const snippets = {
     ...col && {flexDirection: 'column'},
     ...align && {alignItems: align},
     ...justify && {justifyContent: justify},
-    ...gap && {gap},
+    ...gap && {gap}
   }),
   p     : (v) => ({padding: v}),
   pxy   : (x, y) => ({padding: `${y} ${x}`}),
@@ -16,7 +16,7 @@ export const snippets = {
   pr    : (r) => ({paddingRight: r}),
   pl    : (l) => ({paddingLeft: l}),
   f     : (v) => ({fontSize: v}),
-  dur   : (t, type = 'all') => ({transition: `${type} ${t}`,}),
+  dur   : (t, type = 'all') => ({transition: `${type} ${t}`}),
   w     : (w) => ({width: w}),
   minW  : (w) => ({minWidth: w}),
   maxW  : (w) => ({maxWidth: w}),
@@ -32,16 +32,16 @@ export const snippets = {
   w100  : {width: '100%'},
   wh100 : {
     height: '100%',
-    width : '100%',
+    width : '100%'
   },
   abs: {
-    position: 'absolute',
+    position: 'absolute'
   },
   rlt: {
-    position: 'relative',
+    position: 'relative'
   },
   nonSel: {
-    userSelect: 'none',
+    userSelect: 'none'
   },
   nonEve: {
     pointerEvents: 'none'
@@ -66,7 +66,7 @@ export const snippets = {
       0 0 ${size * 2}px ${this.getColor('primary', 0, 0.8)},
       0 0 ${size * 4}px ${this.getColor('primary', 1, 0.8)},
       0 0 ${size * 6}px ${this.getColor('primary', 2, 0.8)}
-    `,
+    `
     }
   },
   bgGrow(size = 2) {

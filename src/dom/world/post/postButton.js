@@ -32,8 +32,9 @@ export const delPostButton = (x, y) => {
   const el = id(`post-button_${x}_${y}`)
   if(el) {
     el.onclick = null
-    el.className = 'PostButton PostButtonFaseOut'
-    setTimeout(() => el.remove(), 400)
+    // el.className = 'PostButton PostButtonFadeOut'
+    // setTimeout(() => el.remove(), 400)
+    el.remove()
   }
 }
 
@@ -43,9 +44,12 @@ export function postButton() {
 
     let settedPoints = {}
 
+    const viewZ = 5
+
     watchCamera((camera) => {
-      if (camera[2] < 3) {
-        let visiblePoints = postionAdapter.calcVisiblePoints(camera, 0.9)
+      if (camera[2] < viewZ) {
+
+        let visiblePoints = postionAdapter.calcVisiblePoints(camera, 1.1)
         oForEachK(settedPoints, key => {
           settedPoints[key] = false
         })
@@ -65,65 +69,63 @@ export function postButton() {
             delete settedPoints[k]
           }
         })
+        style.set('.PostButton', {...postButtonC, opacity: 2 * (1 - (camera[2] / viewZ))})
       }else{
         if (!isEmptyO(settedPoints)) {
           _qsA(domContainerEl, '.PostButton').forEach(el => {
-            el.className = 'PostButton PostButtonFaseOut'
-            setTimeout(() => el.remove(), 400)
+            el.className = 'PostButton fadeOut'
+            el.remove()
           })
+          style.set('.PostButton', {...postButtonC, opacity: 0})
           settedPoints = {}
         }
       }
     })
   })
 
-  style.set('.PostButton', PostButtonC)
-  style.hover('.PostButton', PostButtonHoverC)
-  style.set('.PostButtonFaseOut', postButtonFadeOut)
-  style.keyframe('postButtonFadein', postButtonFadein)
+  style.set('.PostButton', postButtonC)
+  style.hover('.PostButton', postButtonHoverC)
+  // style.set('.fadeOut', fadeOut)
+  // style.keyframe('fadein', fadein)
 
 }
 
 //-------------------------------------------
 
-const PostButtonC = {
+const postButtonC = {
   ..._.abs,
   ..._.wh('80px'),
-  ..._.txC({type: 'text', i: 0, alpha: 0.25}),
-  ..._.bgC({type: 'gray', i: 0, alpha: 0.25}),
+  ..._.txC({type: 'text', i: 0, alpha: 0.5}),
+  ..._.bgC({type: 'gray', i: 1, alpha: 0.5}),
   ..._.flex({align: 'center', justify: 'center'}),
   ..._.bRd('50%'),
   ..._.bgBlur(4),
   ..._.dur('0.4s'),
+  // ..._.dur('0.2s', 'opacity'),
   ..._.breakWord,
-  animationName       : 'postButtonFadein',
-  animationDuration   : '.6s ',
   cursor              : 'pointer',
   contain             : 'strict',
   contentVisibility   : 'auto',
   containIntrinsicSize: '0px'
 }
 
-const postButtonFadein = {
-  from: {
-    ..._.txC({type: 'text', i: 0, alpha: 0.01}),
-    ..._.bgC({type: 'gray', i: 0, alpha: 0.01}),
-    boxShadow: ''
-  },
-  to: {
-    ..._.txC({type: 'text', i: 0, alpha: 0.25}),
-    ..._.bgC({type: 'gray', i: 0, alpha: 0.25})
-  }
-}
+// const fadein = {
+//   from: {
+//     opacity: 0
+//   },
+//   to: {
+//     opacity: 1
+//   }
+// }
 
-const postButtonFadeOut = {
-  ..._.txC({type: 'text', i: 0, alpha: 0.001}),
-  ..._.bgC({type: 'gray', i: 0, alpha: 0.001})
-}
+// const fadeOut = {
+//   animationName: '',
+//   opacity      : 0
+// }
 
-const PostButtonHoverC = {
+const postButtonHoverC = {
   ..._.txC({type: 'primary', i: 0}),
-  ..._.bgC({type: 'gray', i: 0, alpha: 0.7}),
+  ..._.bgC({type: 'gray', i: 1, alpha: 0.2}),
   ..._.txGrow(10),
   ..._.bgGrow(6)
 }

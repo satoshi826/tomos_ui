@@ -51,7 +51,7 @@ export function core() {
       let testMessage = aToO(range(size * size), (i) => {
         const x = (i % size)
         const y = Math.floor(i / size)
-        const l = Math.pow(10, random(-1, 2))
+        const l = Math.pow(10, random(-1, 4))
         return [
           `post${x + X}_${y + Y}`,
           {
