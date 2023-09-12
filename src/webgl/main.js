@@ -76,7 +76,6 @@ export async function main(core) {
   setInterval(() => sendState({drawTime: Number(animation.drawTime).toFixed(2) + ' ms', fps: Number(1000 / animation.delta).toFixed(2)}), 200)
 }
 
-
 // setHandler('mouse', (mouse) => {
 //   const x = mouse?.x ?? 0
 //   const y = mouse?.y ?? 0
@@ -88,7 +87,7 @@ const initGl = (gl) => {
   gl.enable(gl.BLEND)
   gl.blendFunc(gl.ONE, gl.ONE)
   gl.depthMask(false)
-  gl.colorMask(true, true, true, false)
+  // gl.colorMask(true, true, true, false)
   gl.getExtension('EXT_color_buffer_float')
   gl.getExtension('EXT_float_blend')
   gl.getExtension('OES_texture_half_float')
