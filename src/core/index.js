@@ -73,7 +73,8 @@ export function core() {
   watchCurrentTopic(async(topic) => {
     if (!topic) return
     const [x, y] = topic
-    const posts = await infra.posts[`${x}.${y}`]
+    const posts = await infra.get.posts(`${x}.${y}`)
+
     const postsObj = aToO(posts, (post) => {
       const [, x, y] = post['t.x.y'].split('.')
       return [

@@ -25,7 +25,7 @@ export function postEditor() {
       if ((!navbarEl.contains(e.target))) setEditPostMode(false)
     }
 
-    const clickPost = () => {
+    const clickPost = async() => {
       const input = id('post-editor-input')
       const [x, y] = getEditPostMode()
       addPost({
@@ -33,8 +33,8 @@ export function postEditor() {
           'x.y': [x, y],
           m    : input.value
         }})
-      infra.post[`${x}.${y}`] = input.value
-      // infra.post[`${x}.${y}`]('yoyoyo')
+      console.log(infra.set.post)
+      const res = await infra.set.post[`${x}.${y}`](input.value)
       id(`post-button_${x}_${y}`).remove()
       setEditPostMode(false)
     }

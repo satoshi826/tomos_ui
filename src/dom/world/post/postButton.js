@@ -32,8 +32,6 @@ export const delPostButton = (x, y) => {
   const el = id(`post-button_${x}_${y}`)
   if(el) {
     el.onclick = null
-    // el.className = 'PostButton PostButtonFadeOut'
-    // setTimeout(() => el.remove(), 400)
     el.remove()
   }
 }
@@ -44,7 +42,7 @@ export function postButton() {
 
     let settedPoints = {}
 
-    const viewZ = 5
+    const viewZ = 10
 
     watchCamera((camera) => {
       if (camera[2] < viewZ) {
@@ -69,7 +67,7 @@ export function postButton() {
             delete settedPoints[k]
           }
         })
-        style.set('.PostButton', {...postButtonC, opacity: 2 * (1 - (camera[2] / viewZ))})
+        style.set('.PostButton', {...postButtonC, opacity: 1 * (1 - (camera[2] / viewZ))})
       }else{
         if (!isEmptyO(settedPoints)) {
           _qsA(domContainerEl, '.PostButton').forEach(el => {
@@ -85,8 +83,6 @@ export function postButton() {
 
   style.set('.PostButton', postButtonC)
   style.hover('.PostButton', postButtonHoverC)
-  // style.set('.fadeOut', fadeOut)
-  // style.keyframe('fadein', fadein)
 
 }
 
@@ -100,28 +96,13 @@ const postButtonC = {
   ..._.flex({align: 'center', justify: 'center'}),
   ..._.bRd('50%'),
   ..._.bgBlur(4),
-  ..._.dur('0.4s'),
-  // ..._.dur('0.2s', 'opacity'),
+  ..._.dur('0.2s'),
   ..._.breakWord,
   cursor              : 'pointer',
   contain             : 'strict',
   contentVisibility   : 'auto',
   containIntrinsicSize: '0px'
 }
-
-// const fadein = {
-//   from: {
-//     opacity: 0
-//   },
-//   to: {
-//     opacity: 1
-//   }
-// }
-
-// const fadeOut = {
-//   animationName: '',
-//   opacity      : 0
-// }
 
 const postButtonHoverC = {
   ..._.txC({type: 'primary', i: 0}),
