@@ -3,7 +3,7 @@ import {beforeend, addMultiEL, rmMultiEL} from '../../../../lib/dom'
 import {style} from '../../../../lib/theme'
 import {snippets as _} from '../../../theme/snippets'
 import {addPost} from '../../../core'
-import {infra} from '../../../infra'
+import {infra4, mutation} from '../../../infra'
 import {divider} from '../../common/divider'
 
 import {watchEditPostMode, setEditPostMode, getEditPostMode} from '.'
@@ -33,8 +33,9 @@ export function postEditor() {
           'x.y': [x, y],
           m    : input.value
         }})
-      console.log(infra.set.post)
-      const res = await infra.set.post[`${x}.${y}`](input.value)
+      // console.log(infra.set.post)
+      const res = await infra4(mutation).post.add({x, y, m: input.value})
+      console.log(res)
       id(`post-button_${x}_${y}`).remove()
       setEditPostMode(false)
     }

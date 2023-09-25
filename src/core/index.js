@@ -1,11 +1,14 @@
 import {state} from '../../lib/state'
 import {sendState} from '../dom/canvas'
-import {aToO, range, values, random} from '../../lib/util'
-import {infra, getFetch} from '../infra'
+import {aToO, range, values, random, uuid} from '../../lib/util'
+import {infra4, mutation} from '../infra'
+import {webRTC} from '../infra/webRTC'
+
 
 const initCamera = [0, 0, 5]
 export const [watchCamera, setCamera, getCamera] = state({key: 'cameraPosition', init: initCamera})
 export const [watchCurrentTopic, setCurrentTopic, getCurrentTopic] = state({key: 'currentTopic', init: [0, 0]})
+export const [watchCurrentArea, setCurrentArea, getCurrentArea] = state({key: 'currentArea', init: [0, 0]})
 
 export const [watchPosts, setPosts, getPosts] = state({key: 'worldPosts', init: {}})
 export const [watchAddPosts, setAddPosts, getAddPosts] = state({key: 'worldPostsAdd', init: {}})
@@ -31,20 +34,50 @@ export const setPost = (v) => setPosts((pre) => ({...pre, ...v}))
 
 export function core() {
 
+  setTimeout(async() => {
+
+    let uid = await infra4({getLocal: true}).user.uid()
+    if (!uid) {
+      uid = uuid()
+      await infra4({setLocal: uid}).user.uid()
+    }
+
+
+    webRTC.init({onGetLocalDescription: (localDescription) => {
+      infra4(mutation).user.add({
+        id  : 'testId',
+        uid,
+        localDescription,
+        name: 'hoge'
+      }).then((v) => console.log(v))
+    }})
+
+  }, 1000)
+
   watchCamera((cameraPosition) => {
     sendState({cameraPosition})
 
-    const [curX, curY] = getCurrentTopic() ?? [null, null]
+    const [curXX, curYY] = getCurrentTopic() ?? [null, null]
+    const [curXXX, curYYY] = getCurrentArea() ?? [null, null]
+
     const [x, y, z] = cameraPosition
+
+    const xx = 10 * (Math.trunc(x / 10) + Math.sign(x))
+    const yy = 10 * (Math.trunc(y / 10) + Math.sign(y))
+
+    const xxx = 100 * (Math.trunc(x / 100) + Math.sign(x))
+    const yyy = 100 * (Math.trunc(y / 100) + Math.sign(y))
+
+    if(xxx !== curXXX || yyy !== curYYY) {
+      console.log(xxx, yyy)
+      setCurrentArea([xxx, yyy])
+    }
 
 
     if (z > 500) {
-      if(curX !== null) setCurrentTopic(null)
+      if(curXX !== null) setCurrentTopic(null)
       return
     }
-
-    const X = 10 * (Math.trunc(x / 10) + Math.sign(x))
-    const Y = 10 * (Math.trunc(y / 10) + Math.sign(y))
 
     if (z > 200) {
       const size = 8
@@ -53,9 +86,9 @@ export function core() {
         const y = Math.floor(i / size)
         const l = Math.pow(10, random(-1, 2))
         return [
-          `post${x + X}_${y + Y}`,
+          `post${x + xx}_${y + yy}`,
           {
-            'x.y': [x + X, y + Y],
+            'x.y': [x + xx, y + yy],
             m    : l.toFixed(1),
             l
           }
@@ -65,16 +98,15 @@ export function core() {
       return
     }
 
-    if(X !== curX || Y !== curY) {
-      setCurrentTopic([X, Y])
+    if(z < 15 && xx !== curXX || yy !== curYY) {
+      setCurrentTopic([xx, yy])
     }
   })
 
   watchCurrentTopic(async(topic) => {
     if (!topic) return
-    const [x, y] = topic
-    const posts = await infra.get.posts(`${x}.${y}`)
-
+    const [xx, yy] = topic
+    const posts = await infra4().post.get({xx, yy})
     const postsObj = aToO(posts, (post) => {
       const [, x, y] = post['t.x.y'].split('.')
       return [
@@ -96,25 +128,43 @@ export function core() {
     })
   })
 
-  setInterval(() => {
-    requestIdleCallback(async() => {
-      const topic = getCurrentTopic()
-      if (!topic) return
-      const [x, y] = topic
-      const posts = await getFetch({method: 'posts', key: `${x}.${y}`})
-      const postsObj = aToO(posts, (post) => {
-        const [, x, y] = post['t.x.y'].split('.')
-        return [
-          `post${x}_${y}`,
-          {
-            'x.y': [x, y],
-            m    : post.m
-          }
-        ]
-      })
-      addPost(postsObj)
+  watchCurrentArea(async() => {
+    const [x, y] = getCamera()
+    infra4(mutation).user.setLocate({
+      id: 'testId',
+      uid,
+      x,
+      y
+    }).then((v) => console.log(v))
+  })
+
+  setInterval(async() => {
+    const topic = getCurrentTopic()
+    if (!topic) return
+    const [xx, yy] = topic
+    const posts = infra4().post.get({xx, yy})
+
+    const [x, y] = getCamera()
+
+    infra4(mutation).user.setLocate({
+      id: 'testId',
+      uid,
+      x,
+      y
+    }).then((v) => console.log(v))
+
+    const postsObj = aToO(await posts, (post) => {
+      const [, x, y] = post['t.x.y'].split('.')
+      return [
+        `post${x}_${y}`,
+        {
+          'x.y': [x, y],
+          m    : post.m
+        }
+      ]
     })
-  }, 10000)// 人多い程更新頻度増やす？ tも有効に使う
+    addPost(postsObj)
+  }, 8000)// 人多い程更新頻度増やす？ tも有効に使う
 
   // const size = 2
   // let testMessage = aToO(range(size * size), (i) => {
