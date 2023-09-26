@@ -72,13 +72,16 @@ const enqueue = ({type, method, args}) => {
 // swrも仕込む
 export const infra4 = ({ttl, throttle, setLocal, getLocal} = query) => new Proxy({}, {
   get: (_, type) => new Proxy({}, {
-    get: (_, method) => async(args) => {
+    get: (_, method) => async(args = null) => {
       if (getLocal || ttl || throttle) {
-        const cacheVal = await cache.get({type, method, args: throttle ? '' : args, ttl: throttle ?? ttl})
+        console.log(cache)
+        const cacheVal = await cache.get({type, method, args: throttle ? null : args, ttl: throttle ?? ttl ?? 0})
         if (!isNil(cacheVal) || getLocal) return cacheVal
       }
-      const {result, timestamp} = isNil(setLocal) ? await enqueue({type, method, args}) : {}
-      if (setLocal || ttl || throttle) cache.set({type, method, args: throttle ? '' : args, value: setLocal ?? result, timestamp})
+      const {result, timestamp} = isNil(setLocal) ? await enqueue({type, method, args}) : {result: setLocal, timestamp: Infinity}
+      if (setLocal || ttl || throttle) {
+        cache.set({type, method, args: throttle ? null : args, value: throttle ? true : result, timestamp})
+      }
       return result
     }
   })

@@ -129,6 +129,7 @@ export function core() {
   })
 
   watchCurrentArea(async() => {
+    let uid = await infra4({getLocal: true}).user.uid()
     const [x, y] = getCamera()
     infra4(mutation).user.setLocate({
       id: 'testId',
@@ -139,6 +140,8 @@ export function core() {
   })
 
   setInterval(async() => {
+    let uid = await infra4({getLocal: true}).user.uid('')
+    console.log(uid)
     const topic = getCurrentTopic()
     if (!topic) return
     const [xx, yy] = topic
