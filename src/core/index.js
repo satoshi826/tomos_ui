@@ -140,7 +140,7 @@ export function core() {
   })
 
   setInterval(async() => {
-    let uid = await infra4({getLocal: true}).user.uid('')
+    let uid = await infra4({getLocal: true}).user.uid()
     console.log(uid)
     const topic = getCurrentTopic()
     if (!topic) return
