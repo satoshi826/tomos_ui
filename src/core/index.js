@@ -150,11 +150,15 @@ export function core() {
     const [x, y] = getCamera()
 
     infra4(mutation).user.setLocate({
-      id: 'testId',
+      id    : 'testId',
       uid,
       x,
-      y
-    }).then((v) => console.log(v))
+      y,
+      update: Date.now()
+    })
+
+    const [xxx, yyy] = getCurrentArea()
+    infra4().user.getByLocate({xxx, yyy}).then(console.log)
 
     const postsObj = aToO(await posts, (post) => {
       const [, x, y] = post['t.x.y'].split('.')
@@ -168,21 +172,6 @@ export function core() {
     })
     addPost(postsObj)
   }, 8000)// 人多い程更新頻度増やす？ tも有効に使う
-
-  // const size = 2
-  // let testMessage = aToO(range(size * size), (i) => {
-  //   const x = (i % size)
-  //   const y = Math.floor(i / size)
-  //   return [
-  //     `post${x}_${y}`,
-  //     {
-  //       'x.y': [x, y],
-  //       m    : 'テストポスト' + i
-  //     }
-  //   ]
-  // })
-  // console.log(testMessage)
-  // addPost(testMessage)
 }
 
 //----------------------------------------------------------------
