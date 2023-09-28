@@ -156,7 +156,7 @@ export function core() {
 
     const [xxx, yyy] = getCurrentArea()
     infra4().user.getByLocate({xxx, yyy}).then((res) => {
-      const p2p = res.filter(u => u.uid !== uid && u.update + 5 * 60 * 1000 > Date.now).map(({localDescription}) => localDescription)
+      const p2p = res.filter(u => u.uid !== uid && u.update + 5 * 60 * 1000 > Date.now()).map(({localDescription}) => localDescription)
       console.log(res)
       console.log(p2p)
     })
