@@ -2,7 +2,7 @@ import {state} from '../../lib/state'
 import {sendState} from '../dom/canvas'
 import {aToO, range, values, random, uuid} from '../../lib/util'
 import {infra4, mutation} from '../infra'
-import {webRTC} from '../infra/webRTC'
+import {Peer} from '../../lib/webRTC'
 
 
 const initCamera = [0, 0, 5]
@@ -42,15 +42,15 @@ export function core() {
       await infra4({setLocal: uid}).user.uid()
     }
 
+    const peer = new Peer()
+    const localDescription = await peer.init()
 
-    webRTC.init({onGetLocalDescription: (localDescription) => {
-      infra4(mutation).user.add({
-        id  : 'testId',
-        uid,
-        localDescription,
-        name: 'hoge'
-      }).then((v) => console.log(v))
-    }})
+    infra4(mutation).user.add({
+      id  : 'testId',
+      uid,
+      localDescription,
+      name: 'hoge'
+    }).then((v) => console.log(v))
 
   }, 1000)
 
@@ -141,24 +141,25 @@ export function core() {
 
   setInterval(async() => {
     let uid = await infra4({getLocal: true}).user.uid()
-    console.log(uid)
     const topic = getCurrentTopic()
     if (!topic) return
     const [xx, yy] = topic
     const posts = infra4().post.get({xx, yy})
 
     const [x, y] = getCamera()
-
     infra4(mutation).user.setLocate({
-      id    : 'testId',
+      id: 'testId',
       uid,
       x,
-      y,
-      update: Date.now()
+      y
     })
 
     const [xxx, yyy] = getCurrentArea()
-    infra4().user.getByLocate({xxx, yyy}).then(console.log)
+    infra4().user.getByLocate({xxx, yyy}).then((res) => {
+      const p2p = res.filter(u => u.uid !== uid && u.update + 5 * 60 * 1000 > Date.now).map(({localDescription}) => localDescription)
+      console.log(res)
+      console.log(p2p)
+    })
 
     const postsObj = aToO(await posts, (post) => {
       const [, x, y] = post['t.x.y'].split('.')
