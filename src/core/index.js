@@ -43,12 +43,12 @@ export function core() {
     }
 
     const peer = new Peer()
-    const localDescription = await peer.init()
+    const offerSDP = await peer.init()
 
     infra4(mutation).user.add({
       id  : 'testId',
       uid,
-      localDescription,
+      offerSDP,
       name: 'hoge'
     }).then((v) => console.log(v))
 
@@ -156,9 +156,14 @@ export function core() {
 
     const [xxx, yyy] = getCurrentArea()
     infra4().user.getByLocate({xxx, yyy}).then((res) => {
-      const p2p = res.filter(u => u.uid !== uid && u.update + 5 * 60 * 1000 > Date.now()).map(({localDescription}) => localDescription)
+      const p2p = res
+        .filter(u => u.uid > uid && u.update + 5 * 60 * 1000 > Date.now())
+        .map(({offerSDP}) => offerSDP)
+      if (p2p[0]) {
+        console.log(p2p[0])
+      }
+      console.log(uid)
       console.log(res)
-      console.log(p2p)
     })
 
     const postsObj = aToO(await posts, (post) => {

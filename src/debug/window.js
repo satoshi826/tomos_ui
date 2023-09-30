@@ -52,7 +52,7 @@ const interceptLog = (el) => {
   const log = console.log.bind(console)
   console.log = (...args) => {
     if(isViewLog) {
-      if(args[0].startsWith('_$')) {
+      if(typeof args[0] === 'string' && args[0]?.startsWith('_$')) {
         const index = args[0][2]
         logList[index] = args[0].substr(3)
       }else{

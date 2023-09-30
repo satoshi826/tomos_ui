@@ -74,7 +74,6 @@ export const infra4 = ({ttl, throttle, setLocal, getLocal} = query) => new Proxy
   get: (_, type) => new Proxy({}, {
     get: (_, method) => async(args = null) => {
       if (getLocal || ttl || throttle) {
-        console.log(cache)
         const cacheVal = await cache.get({type, method, args: throttle ? null : args, ttl: throttle ?? ttl ?? 0})
         if (!isNil(cacheVal) || getLocal) return cacheVal
       }
