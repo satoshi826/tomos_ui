@@ -34,20 +34,22 @@ export const setPost = (v) => setPosts((pre) => ({...pre, ...v}))
 
 export function core() {
 
+  const peer = new Peer()
+
   setTimeout(async() => {
 
-    let uid = await infra4({getLocal: true}).user.uid()
-    if (!uid) {
-      uid = uuid()
-      await infra4({setLocal: uid}).user.uid()
+    let id = await infra4({getLocal: true}).user.uid()
+    if (!id) {
+      id = uuid()
+      await infra4({setLocal: id}).user.uid()
     }
 
-    const peer = new Peer()
     const offerSDP = await peer.init()
+    console.log('offer')
+    console.log(offerSDP)
 
     infra4(mutation).user.add({
-      id  : 'testId',
-      uid,
+      id,
       offerSDP,
       name: 'hoge'
     }).then((v) => console.log(v))
@@ -129,18 +131,17 @@ export function core() {
   })
 
   watchCurrentArea(async() => {
-    let uid = await infra4({getLocal: true}).user.uid()
+    let id = await infra4({getLocal: true}).user.uid()
     const [x, y] = getCamera()
     infra4(mutation).user.setLocate({
-      id: 'testId',
-      uid,
+      id,
       x,
       y
     }).then((v) => console.log(v))
   })
 
   setInterval(async() => {
-    let uid = await infra4({getLocal: true}).user.uid()
+    let id = await infra4({getLocal: true}).user.uid()
     const topic = getCurrentTopic()
     if (!topic) return
     const [xx, yy] = topic
@@ -148,21 +149,25 @@ export function core() {
 
     const [x, y] = getCamera()
     infra4(mutation).user.setLocate({
-      id: 'testId',
-      uid,
+      id,
       x,
       y
     })
 
     const [xxx, yyy] = getCurrentArea()
-    infra4().user.getByLocate({xxx, yyy}).then((res) => {
+    infra4().user.getByLocate({xxx, yyy}).then(async(res) => {
       const p2p = res
-        .filter(u => u.uid > uid && u.update + 5 * 60 * 1000 > Date.now())
+        .filter(u => u.id > id && u.update + 5 * 60 * 1000 > Date.now())
         .map(({offerSDP}) => offerSDP)
-      if (p2p[0]) {
-        console.log(p2p[0])
+      const offer = p2p[0]
+      console.log(peer)
+      if (offer && !peer.remoteSDP) {
+        console.log(peer)
+        peer.setOfferSdp(offer).then((answer) => {
+          console.log('answer')
+          console.log(answer)
+        })
       }
-      console.log(uid)
       console.log(res)
     })
 
