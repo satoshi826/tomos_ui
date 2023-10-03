@@ -156,17 +156,20 @@ export function core() {
     const [xxx, yyy] = getCurrentArea()
     infra4({ttl: 15}).user.getByLocate({xxx, yyy}).then(async(res) => {
       const p2p = res
-        .filter(u => u.id < id && u.update + 5 * 60 * 1000 > Date.now())
+        .filter(u => u.id < id && u.update + 10 * 60 * 1000 > Date.now())
         .map(({offerSDP, id}) => ({
           offerSDP, id
         }))
       const offer = p2p[0]
+      console.log(res)
       if (offer && !peer.remoteSDP) {
         console.log(peer)
         peer.setOfferSdp(offer.offerSDP).then((answer) => {
           console.log('answer')
           console.log(answer)
-          infra4().user.signaling({id: offer.id, sdp: answer}).then(console.log)
+          infra4().user.signaling({id: offer.id, sdp: answer}).then(res => {
+            console.log(res)
+          })
         })
       }
     })
