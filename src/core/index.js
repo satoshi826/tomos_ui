@@ -4,7 +4,6 @@ import {aToO, range, values, random, uuid} from '../../lib/util'
 import {infra4, mutation} from '../infra'
 import {Peer} from '../../lib/webRTC'
 
-
 const initCamera = [0, 0, 5]
 export const [watchCamera, setCamera, getCamera] = state({key: 'cameraPosition', init: initCamera})
 export const [watchCurrentTopic, setCurrentTopic, getCurrentTopic] = state({key: 'currentTopic', init: [0, 0]})
@@ -158,11 +157,10 @@ export function core() {
     infra4().user.getByLocate({xxx, yyy}).then(async(res) => {
       const p2p = res
         .filter(u => u.id > id && u.update + 5 * 60 * 1000 > Date.now())
-        .map(({offerSDP, id}) => {
+        .map(({offerSDP, id}) => ({
           offerSDP, id
-        })
+        }))
       const offer = p2p[0]
-      console.log(peer)
       if (offer && !peer.remoteSDP) {
         console.log(peer)
         peer.setOfferSdp(offer.offerSDP).then((answer) => {
@@ -171,8 +169,9 @@ export function core() {
           infra4().user.signaling({id: offer.id, sdp: answer}).then(console.log)
         })
       }
-      console.log(res)
     })
+
+    infra4({ttl: 2}).notification.pull({id}).then(console.log)
 
     const postsObj = aToO(await posts, (post) => {
       const [, x, y] = post['t.x.y'].split('.')
