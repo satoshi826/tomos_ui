@@ -175,10 +175,12 @@ export function core() {
     })
 
     infra4({ttl: 2}).notification.pull({id}).then(res => {
-      const notif = res.sort((a, b) => a.time < b.time)[0]
-      console.log(notif.time)
-      console.log(Date.now())
-      if (notif.time + 5 * 60 * 1000 > Date.now()) peer.setAnswerSdp(notif.sdp)
+      const notif = res.sort((a, b) => a.time < b.time ? 1 : -1)[0]
+      console.log(res)
+      if (notif.time + 5 * 60 * 1000 > Date.now()) {
+        console.log(peer.localSDP)
+        peer.setAnswerSdp(notif.sdp)
+      }
 
     })
 
