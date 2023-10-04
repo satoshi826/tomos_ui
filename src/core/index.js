@@ -156,7 +156,7 @@ export function core() {
     const [xxx, yyy] = getCurrentArea()
     infra4({ttl: 15}).user.getByLocate({xxx, yyy}).then(async(res) => {
       const p2p = res
-        .filter(u => u.id > id && u.update + 10 * 60 * 1000 > Date.now())
+        .filter(u => u.id < id && u.update + 10 * 60 * 1000 > Date.now())
         .map(({offerSDP, id}) => ({
           offerSDP, id
         }))
