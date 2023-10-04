@@ -156,7 +156,7 @@ export function core() {
     const [xxx, yyy] = getCurrentArea()
     infra4({ttl: 15}).user.getByLocate({xxx, yyy}).then(async(res) => {
       const p2p = res
-        .filter(u => u.id < id && u.update + 10 * 60 * 1000 > Date.now())
+        .filter(u => u.id > id && u.update + 10 * 60 * 1000 > Date.now())
         .map(({offerSDP, id}) => ({
           offerSDP, id
         }))
@@ -174,7 +174,13 @@ export function core() {
       }
     })
 
-    infra4({ttl: 2}).notification.pull({id}).then(console.log)
+    infra4({ttl: 2}).notification.pull({id}).then(res => {
+      const notif = res.sort((a, b) => a.time < b.time)[0]
+      console.log(notif.time)
+      console.log(Date.now())
+      if (notif.time + 5 * 60 * 1000 > Date.now()) peer.setAnswerSdp(notif.sdp)
+
+    })
 
     const postsObj = aToO(await posts, (post) => {
       const [, x, y] = post['t.x.y'].split('.')
