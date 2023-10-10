@@ -156,7 +156,7 @@ export function core() {
     const [xxx, yyy] = getCurrentArea()
     infra4({ttl: 15}).user.getByLocate({xxx, yyy}).then(async(res) => {
       const p2p = res
-        .filter(u => u.id < id && u.update + 10 * 60 * 1000 > Date.now())
+        .filter(u => u.update + 10 * 60 * 1000 > Date.now())
         .map(({offerSDP, id}) => ({
           offerSDP, id
         }))
@@ -179,6 +179,7 @@ export function core() {
       console.log(res)
       if (notif.time + 5 * 60 * 1000 > Date.now()) {
         console.log(peer.localSDP)
+        console.log(notif.sdp)
         peer.setAnswerSdp(notif.sdp)
       }
 
