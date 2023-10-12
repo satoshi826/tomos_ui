@@ -161,6 +161,7 @@ export function core() {
           offerSDP, id
         }))
       const offer = p2p[0]
+      console.log(id)
       console.log(res)
       if (offer && !peer.remoteSDP) {
         console.log(peer)
@@ -174,13 +175,18 @@ export function core() {
       }
     })
 
+    let flag = false
+
     infra4({ttl: 2}).notification.pull({id}).then(res => {
       const notif = res.sort((a, b) => a.time < b.time ? 1 : -1)[0]
       console.log(res)
       if (notif.time + 5 * 60 * 1000 > Date.now()) {
-        console.log(peer.localSDP)
-        console.log(notif.sdp)
-        peer.setAnswerSdp(notif.sdp)
+        console.log('offer', peer.localSDP)
+        console.log('answer', notif.sdp)
+        if(!flag) {
+          peer.setAnswerSdp(notif.sdp).then(res => console.debug('single, successful!!!', res))
+          flag = true
+        }
       }
 
     })
