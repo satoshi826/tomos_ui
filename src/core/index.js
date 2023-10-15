@@ -43,15 +43,12 @@ export function core() {
       await infra4({setLocal: id}).user.uid()
     }
 
-    const offerSDP = await peer.init()
-    console.log('offer')
-    console.log(offerSDP)
-
-    infra4(mutation).user.add({
-      id,
-      offerSDP,
-      name: 'hoge'
-    }).then((v) => console.log(v))
+    // const offerSDP = await peer.createOfferSdp()
+    // infra4(mutation).user.add({
+    //   id,
+    //   offerSDP,
+    //   name: 'hoge'
+    // }).then((v) => console.log(v))
 
   }, 1000)
 
@@ -139,6 +136,9 @@ export function core() {
     }).then((v) => console.log(v))
   })
 
+
+  const peerMap = {}
+
   setInterval(async() => {
     let id = await infra4({getLocal: true}).user.uid()
     const topic = getCurrentTopic()
@@ -154,40 +154,52 @@ export function core() {
     })
 
     const [xxx, yyy] = getCurrentArea()
-    infra4({ttl: 15}).user.getByLocate({xxx, yyy}).then(async(res) => {
-      const p2p = res
-        .filter(u => u.update + 10 * 60 * 1000 > Date.now())
-        .map(({offerSDP, id}) => ({
-          offerSDP, id
-        }))
-      const offer = p2p[0]
-      console.log(id)
-      console.log(res)
-      if (offer && !peer.remoteSDP) {
-        console.log(peer)
-        peer.setOfferSdp(offer.offerSDP).then((answer) => {
-          console.log('answer')
-          console.log(answer)
-          infra4().user.signaling({id: offer.id, sdp: answer}).then(res => {
-            console.log(res)
-          })
-        })
+    const users = await infra4({ttl: 15}).user.getByLocate({xxx, yyy})
+    const userIds = users?.filter(u => u.update + 10 * 60 * 1000 > Date.now() && u.id !== id).map(({id}) => id)
+    const [userId] = userIds
+
+    console.log(userId, id)
+    const isImOfferer = userId && userId > id
+    isImOfferer && console.log('im offerer', userId)
+
+    if(isImOfferer && !peerMap[userId]) {
+      const key = Date.now()
+
+      peerMap[userId] = {
+        type: 'offerer',
+        peer: peer,
+        key
       }
-    })
-
-    let flag = false
-
-    infra4({ttl: 2}).notification.pull({id}).then(res => {
-      const notif = res.sort((a, b) => a.time < b.time ? 1 : -1)[0]
+      const offer = await peer.createOfferSdp()
+      const res = await infra4({throttle: 1}).user.signaling({sub: userId, sdp: offer, type: 'offer', pub: id, key})
       console.log(res)
-      if (notif.time + 5 * 60 * 1000 > Date.now()) {
-        console.log('offer', peer.localSDP)
-        console.log('answer', notif.sdp)
-        if(!flag) {
-          peer.setAnswerSdp(notif.sdp).then(res => console.debug('single, successful!!!', res))
-          flag = true
+    }
+
+    infra4({ttl: 2}).notification.pull({sub: id}).then(async res => {
+      const offer = res.filter(({type}) => type === 'offerSDP').sort((a, b) => a.time < b.time ? 1 : -1)[0]
+      console.log(offer)
+
+      if (offer && offer.time + 5 * 60 * 1000 > Date.now() && !peerMap[offer?.pub]) {
+        peerMap[offer.pub] = {
+          type: 'answerer',
+          peer: peer
         }
+        const answer = await peer.setOfferSdp(offer.sdp)
+        await infra4({throttle: 1}).user.signaling({sub: offer.pub, sdp: answer, type: 'answer', pub: id, key: offer.key})
       }
+
+      const answer = res.filter(({type}) => type === 'answerSDP').sort((a, b) => a.time < b.time ? 1 : -1)[0]
+      console.log(res)
+      console.log(answer)
+      console.log(peerMap)
+      if (peerMap?.[answer?.pub] && answer.time + 5 * 60 * 1000 > Date.now() && !peerMap[answer?.pub]?.isAnswered && answer.key === peerMap[answer?.pub]?.key) {
+        peerMap[answer.pub].isAnswered = true
+        const hoge = await peer.setAnswerSdp(answer.sdp)
+        console.log({hoge})
+      }
+
+      console.log(peer)
+
 
     })
 
@@ -201,6 +213,7 @@ export function core() {
         }
       ]
     })
+
     addPost(postsObj)
   }, 8000)// 人多い程更新頻度増やす？ tも有効に使う
 }
