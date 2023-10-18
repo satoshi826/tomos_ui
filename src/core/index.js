@@ -42,14 +42,6 @@ export function core() {
       id = uuid()
       await infra4({setLocal: id}).user.uid()
     }
-
-    // const offerSDP = await peer.createOfferSdp()
-    // infra4(mutation).user.add({
-    //   id,
-    //   offerSDP,
-    //   name: 'hoge'
-    // }).then((v) => console.log(v))
-
   }, 1000)
 
   watchCamera((cameraPosition) => {
@@ -171,7 +163,7 @@ export function core() {
         key
       }
       const offer = await peer.createOfferSdp()
-      const res = await infra4({throttle: 1}).user.signaling({sub: userId, sdp: offer, type: 'offer', pub: id, key})
+      const res = await infra4({throttle: 0.01}).user.signaling({sub: userId, sdp: offer, type: 'offer', pub: id, key})
       console.log(res)
     }
 
@@ -185,7 +177,7 @@ export function core() {
           peer: peer
         }
         const answer = await peer.setOfferSdp(offer.sdp)
-        await infra4({throttle: 1}).user.signaling({sub: offer.pub, sdp: answer, type: 'answer', pub: id, key: offer.key})
+        await infra4({throttle: 0.01}).user.signaling({sub: offer.pub, sdp: answer, type: 'answer', pub: id, key: offer.key})
       }
 
       const answer = res.filter(({type}) => type === 'answerSDP').sort((a, b) => a.time < b.time ? 1 : -1)[0]

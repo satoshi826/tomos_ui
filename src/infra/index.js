@@ -1,6 +1,5 @@
 import {isNil, oMapO, oForEach, oForEachV, oForEachK} from '../../lib/util'
 import {cache} from './cashe'
-// import {fetch} from './fetch'
 import {Fetcher} from '../../lib/fetch'
 import {API_ENDPOINT} from '../../constants'
 
@@ -50,13 +49,17 @@ const setFetchTimer = () => {
 
 //----------------------------------------------------------------
 
-const enqueue = ({type, method, args}) => {
+const enqueue = ({type, method, args, parallel}) => {
   console.debug('enqueue', type, method, args)
   fetchQueue[type] ??= {}
   setFetchTimer()
   return new Promise((resolve, reject) => {
     if (fetchQueue[type][method]) {
-      reject(`already enqueued method "${type}-${method}"`)
+      if(parallel) {
+        console.debug(fetchQueue)
+      }else{
+        reject(`already enqueued method "${type}-${method}"`)
+      }
       console.debug(fetchQueue)
     }
     fetchQueue[type][method] = {
@@ -70,14 +73,14 @@ const enqueue = ({type, method, args}) => {
 //----------------------------------------------------------------
 
 // swrも仕込む
-export const infra4 = ({ttl, throttle, setLocal, getLocal} = query) => new Proxy({}, {
+export const infra4 = ({ttl, throttle, setLocal, getLocal, parallel} = query) => new Proxy({}, {
   get: (_, type) => new Proxy({}, {
     get: (_, method) => async(args = null) => {
       if (getLocal || ttl || throttle) {
         const cacheVal = await cache.get({type, method, args: throttle ? null : args, ttl: throttle ?? ttl ?? 0})
         if (!isNil(cacheVal) || getLocal) return cacheVal
       }
-      const {result, timestamp} = isNil(setLocal) ? await enqueue({type, method, args}) : {result: setLocal, timestamp: Infinity}
+      const {result, timestamp} = isNil(setLocal) ? await enqueue({type, method, args, parallel}) : {result: setLocal, timestamp: Infinity}
       if (setLocal || ttl || throttle) {
         cache.set({type, method, args: throttle ? null : args, value: throttle ? true : result, timestamp})
       }
