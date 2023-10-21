@@ -3,6 +3,7 @@ import {sendState} from '../dom/canvas'
 import {aToO, range, values, random, uuid} from '../../lib/util'
 import {infra4, mutation} from '../infra'
 import {Peer} from '../../lib/webRTC'
+import {PeerManager} from '../infra/webRTC/peerManager'
 
 const initCamera = [0, 0, 5]
 export const [watchCamera, setCamera, getCamera] = state({key: 'cameraPosition', init: initCamera})
@@ -34,15 +35,18 @@ export const setPost = (v) => setPosts((pre) => ({...pre, ...v}))
 export function core() {
 
   const peer = new Peer()
+  const peerManager = new PeerManager()
+  let id
 
   setTimeout(async() => {
 
-    let id = await infra4({getLocal: true}).user.uid()
+    id = await infra4({getLocal: true}).user.uid()
     if (!id) {
       id = uuid()
       await infra4({setLocal: id}).user.uid()
     }
-  }, 1000)
+    peerManager.myUserId = id
+  }, 100)
 
   watchCamera((cameraPosition) => {
     sendState({cameraPosition})
@@ -128,73 +132,23 @@ export function core() {
     }).then((v) => console.log(v))
   })
 
-
-  const peerMap = {}
+  setInterval(async() => {
+    peerManager.signaling()
+  }, 5000)// 人多い程更新頻度増やす？ tも有効に使う
 
   setInterval(async() => {
-    let id = await infra4({getLocal: true}).user.uid()
     const topic = getCurrentTopic()
     if (!topic) return
     const [xx, yy] = topic
     const posts = infra4().post.get({xx, yy})
 
     const [x, y] = getCamera()
-    infra4(mutation).user.setLocate({
+    id && infra4(mutation).user.setLocate({
       id,
       x,
       y
     })
-
-    const [xxx, yyy] = getCurrentArea()
-    const users = await infra4({ttl: 15}).user.getByLocate({xxx, yyy})
-    const userIds = users?.filter(u => u.update + 10 * 60 * 1000 > Date.now() && u.id !== id).map(({id}) => id)
-    const [userId] = userIds
-
-    console.log(userId, id)
-    const isImOfferer = userId && userId > id
-    isImOfferer && console.log('im offerer', userId)
-
-    if(isImOfferer && !peerMap[userId]) {
-      const key = Date.now()
-
-      peerMap[userId] = {
-        type: 'offerer',
-        peer: peer,
-        key
-      }
-      const offer = await peer.createOfferSdp()
-      const res = await infra4({throttle: 0.01}).user.signaling({sub: userId, sdp: offer, type: 'offer', pub: id, key})
-      console.log(res)
-    }
-
-    infra4({ttl: 2}).notification.pull({sub: id}).then(async res => {
-      const offer = res.filter(({type}) => type === 'offerSDP').sort((a, b) => a.time < b.time ? 1 : -1)[0]
-      console.log(offer)
-
-      if (offer && offer.time + 5 * 60 * 1000 > Date.now() && !peerMap[offer?.pub]) {
-        peerMap[offer.pub] = {
-          type: 'answerer',
-          peer: peer
-        }
-        const answer = await peer.setOfferSdp(offer.sdp)
-        await infra4({throttle: 0.01}).user.signaling({sub: offer.pub, sdp: answer, type: 'answer', pub: id, key: offer.key})
-      }
-
-      const answer = res.filter(({type}) => type === 'answerSDP').sort((a, b) => a.time < b.time ? 1 : -1)[0]
-      console.log(res)
-      console.log(answer)
-      console.log(peerMap)
-      if (peerMap?.[answer?.pub] && answer.time + 5 * 60 * 1000 > Date.now() && !peerMap[answer?.pub]?.isAnswered && answer.key === peerMap[answer?.pub]?.key) {
-        peerMap[answer.pub].isAnswered = true
-        const hoge = await peer.setAnswerSdp(answer.sdp)
-        console.log({hoge})
-      }
-
-      console.log(peer)
-
-
-    })
-
+    peerManager.signaling()
     const postsObj = aToO(await posts, (post) => {
       const [, x, y] = post['t.x.y'].split('.')
       return [
