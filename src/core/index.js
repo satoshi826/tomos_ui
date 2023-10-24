@@ -2,7 +2,6 @@ import {state} from '../../lib/state'
 import {sendState} from '../dom/canvas'
 import {aToO, range, values, random, uuid} from '../../lib/util'
 import {infra4, mutation} from '../infra'
-import {Peer} from '../../lib/webRTC'
 import {PeerManager} from '../infra/webRTC/peerManager'
 
 const initCamera = [0, 0, 5]
@@ -34,18 +33,20 @@ export const setPost = (v) => setPosts((pre) => ({...pre, ...v}))
 
 export function core() {
 
-  const peer = new Peer()
   const peerManager = new PeerManager()
   let id
 
   setTimeout(async() => {
 
     id = await infra4({getLocal: true}).user.uid()
+    console.log(id)
     if (!id) {
       id = uuid()
       await infra4({setLocal: id}).user.uid()
+      console.log(id)
     }
-    peerManager.myUserId = id
+    console.log(await infra4({getLocal: true}).user.uid())
+    peerManager.myUserId = await infra4({getLocal: true}).user.uid()
   }, 100)
 
   watchCamera((cameraPosition) => {
@@ -123,18 +124,19 @@ export function core() {
   })
 
   watchCurrentArea(async() => {
-    let id = await infra4({getLocal: true}).user.uid()
     const [x, y] = getCamera()
-    infra4(mutation).user.setLocate({
+    id && infra4(mutation).user.setLocate({
       id,
       x,
       y
-    }).then((v) => console.log(v))
+    })
   })
 
   setInterval(async() => {
+    console.log(peerManager)
     peerManager.signaling()
-  }, 5000)// 人多い程更新頻度増やす？ tも有効に使う
+    peerManager.dcSendForAll()
+  }, 5000)
 
   setInterval(async() => {
     const topic = getCurrentTopic()
@@ -148,7 +150,6 @@ export function core() {
       x,
       y
     })
-    peerManager.signaling()
     const postsObj = aToO(await posts, (post) => {
       const [, x, y] = post['t.x.y'].split('.')
       return [

@@ -13,16 +13,13 @@ export const cache = {
     this.cacheMap[type][method] ??= {}
     this.cacheMap[type][method][JSON.stringify(args)] = cache
   },
-  async get({type, method, args, ttl}) {
+  async get({type, method, args}) {
     let cache = this.cacheMap?.[type]?.[method]?.[JSON.stringify(args)]
     if (!cache) {
       cache = await indexDB.get(`${type}.${method}.${JSON.stringify(args)}`)
       if (cache) this.setInmemory(type, method, args, cache)
     }
-    if (cache && ((cache.timestamp + ttl * 1000 > Date.now()))) {
-      console.debug('cache hit!', type, method, args, cache.value)
-      return cache.value
-    }
+    if (cache) return cache
     return null
   },
   async set({type, method, args, value, timestamp}) {

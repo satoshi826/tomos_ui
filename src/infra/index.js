@@ -28,7 +28,7 @@ const setFetchTimer = () => {
         })
         ])
       const result = await fetchQL(fetchBody)
-      const timestamp = Date.now()
+      const timestamp = result._time
       oForEach(fetchBody, ([type, methods]) =>
         oForEachK(methods, (method) => {
           if (Array.isArray(fetchQueue[type][method])) {
@@ -46,7 +46,7 @@ const setFetchTimer = () => {
           }
         })
       )
-      console.debug('result', result)
+      console.debug('fetch result', result)
     } catch (err) {
       oForEachV(fetchQueue, (methods) =>
         oForEachV(methods, (v) => arrayed(v).forEach(({reject}) => reject()))
@@ -96,14 +96,29 @@ const enqueue = ({type, method, args, parallel, series}) => {
 //----------------------------------------------------------------
 
 // swrも仕込む
-export const infra4 = ({ttl, throttle, setLocal, getLocal, parallel, series} = query) => new Proxy({}, {
+export const infra4 = ({ttl, throttle, setLocal, getLocal, parallel, series, diff} = query) => new Proxy({}, {
   get: (_, type) => new Proxy({}, {
     get: (_, method) => async(args = null) => {
+      let cacheObject
       if (getLocal || ttl || throttle) {
-        const cacheVal = await cache.get({type, method, args: throttle ? null : args, ttl: throttle ?? ttl ?? 0})
-        if (!isNil(cacheVal) || getLocal) return cacheVal
+        cacheObject = await cache.get({type, method, args: throttle ? null : args})
+        if (!isNil(cacheObject)) {
+          if (cacheObject.timestamp + (throttle ?? ttl ?? 0) * 1000 > Date.now()) {
+            console.debug('cache hit!', type, method, args, cacheObject)
+            return cacheObject.value
+          }
+          console.debug('cache expired', type, method, args)
+        }else if (getLocal) return null
       }
-      const {result, timestamp} = isNil(setLocal) ? await enqueue({type, method, args, parallel, series}) : {result: setLocal, timestamp: Infinity}
+      const {result, timestamp} = isNil(setLocal)
+        ? await enqueue({
+          type,
+          method,
+          args: (diff && cacheObject) ? {...args, _cached: cacheObject.timestamp} : args,
+          parallel,
+          series
+        })
+        : {result: setLocal, timestamp: Infinity}
       if (setLocal || ttl || throttle) {
         cache.set({type, method, args: throttle ? null : args, value: throttle ? true : result, timestamp})
       }

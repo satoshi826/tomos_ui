@@ -1,5 +1,5 @@
 import {Peer} from '../../../lib/webRTC'
-import {partition, oForEach} from '../../../lib/util'
+import {partition, oForEach, oForEachV} from '../../../lib/util'
 import {infra4} from '..'
 import {getCurrentArea} from '../../core'
 
@@ -11,19 +11,19 @@ export class PeerManager {
 
   async getUsers() {
     const [xxx, yyy] = getCurrentArea()
-    const users = await infra4({ttl: 5}).user.getByLocate({xxx, yyy}) // updateでフィルタする
-    return users?.filter(u => u.update + 10 * 60 * 1000 > Date.now()
+    const users = await infra4({ttl: 5, diff: true}).user.getByLocate({xxx, yyy}) // updateでフィルタする
+    return users?.filter(u => u.update + 5 * 60 * 1000 > Date.now()
     && u.id !== this.myUserId
     )
   }
 
   async getOffers() {
-    const notif = await infra4({ttl: 5, series: true}).notification.pull({sub: this.myUserId}) // updateでフィルタする
-    return await notif?.filter(({type, time}) => type === 'offerSDP' && time + 5 * 60 * 1000 > Date.now())
+    const notif = await infra4({ttl: 5, series: true, diff: true}).notification.pull({sub: this.myUserId}) // updateでフィルタする
+    return notif.filter(({type, time}) => type === 'offerSDP' && time + 5 * 60 * 1000 > Date.now())
   }
 
   async getAnswers() {
-    const notif = await infra4({ttl: 5, series: true}).notification.pull({sub: this.myUserId})
+    const notif = await infra4({ttl: 5, series: true, diff: true}).notification.pull({sub: this.myUserId})
     return notif.filter(({type, time}) => type === 'answerSDP' && time + 5 * 60 * 1000 > Date.now())
   }
 
@@ -44,11 +44,23 @@ export class PeerManager {
   }
 
   async dcSendForAll() {
-    throw 'override me'
+    oForEachV(this.peerMap, ({peer, status}) => {
+      if (status === 'connected') {
+        peer.dc.send('iam ' + this.myUserId)
+      }
+    })
   }
 
   getImOfferer(userId) {
     return userId && userId > this.myUserId
+  }
+
+  createPeer(id) {
+    const peer = new Peer()
+    peer.onDataChannelOpen = () => this.peerMap[id].status = 'connected'
+    peer.onDataChannelClose = () => delete this.peerMap[id]
+    peer.onDataChannelError = () => delete this.peerMap[id]
+    return peer
   }
 
   async signaling() {
@@ -56,20 +68,22 @@ export class PeerManager {
     this.getUsers().then(users => {
       const [answererUsers, offererUsers] = partition(users, u => this.getImOfferer(u.id))
       answererUsers.forEach(async u => {
+        const offererPeer = this.createPeer(u.id)
         this.peerMap[u.id] ??= { //古くて未接続なら上書き？
           key   : u.update,
           status: 'offer_creating',
-          peer  : new Peer()
+          peer  : offererPeer
         }
       })
     })
 
     this.getOffers().then((offers) => {
       offers.forEach((offer) => {
+        const answererPeer = this.createPeer(offer.pub)
         this.peerMap[offer.pub] ??= {
           key     : offer.key,
           status  : 'offer_received',
-          peer    : new Peer(),
+          peer    : answererPeer,
           offerSDP: offer.sdp
         }
       })
