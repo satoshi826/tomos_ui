@@ -10,5 +10,5 @@ export const shape = {
   },
   navbar: {
     height: '50px'
-  },
+  }
 }

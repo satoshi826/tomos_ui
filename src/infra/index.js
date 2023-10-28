@@ -4,7 +4,6 @@ import {Fetcher} from '../../lib/fetch'
 import {API_ENDPOINT} from '../../constants'
 
 const fetcher = new Fetcher(API_ENDPOINT)
-
 export const query = {ttl: 120}
 export const mutation = {throttle: 10}
 
@@ -96,6 +95,7 @@ const enqueue = ({type, method, args, parallel, series}) => {
 //----------------------------------------------------------------
 
 // swrも仕込む
+// mergeオプションも付ける
 export const infra4 = ({ttl, throttle, setLocal, getLocal, parallel, series, diff} = query) => new Proxy({}, {
   get: (_, type) => new Proxy({}, {
     get: (_, method) => async(args = null) => {

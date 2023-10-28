@@ -1,37 +1,20 @@
 import {state} from '../../lib/state'
 import {sendState} from '../dom/canvas'
-import {aToO, range, values, random, uuid} from '../../lib/util'
+import {aToO, range, random, uuid} from '../../lib/util'
 import {infra4, mutation} from '../infra'
 import {PeerManager} from '../infra/webRTC/peerManager'
+import {addPost, post} from './post'
+import {user} from './user'
 
 const initCamera = [0, 0, 5]
 export const [watchCamera, setCamera, getCamera] = state({key: 'cameraPosition', init: initCamera})
 export const [watchCurrentTopic, setCurrentTopic, getCurrentTopic] = state({key: 'currentTopic', init: [0, 0]})
 export const [watchCurrentArea, setCurrentArea, getCurrentArea] = state({key: 'currentArea', init: [0, 0]})
 
-export const [watchPosts, setPosts, getPosts] = state({key: 'worldPosts', init: {}})
-export const [watchAddPosts, setAddPosts, getAddPosts] = state({key: 'worldPostsAdd', init: {}})
-export const [watchDelPosts, setDelPosts, getDelPosts] = state({key: 'worldPostsDel', init: {}})
-
-export const addPost = (posts) => {
-  setPosts(pre => ({...posts, ...pre}))
-  setAddPosts(posts)
-}
-
-export const delPost = (keys) => {
-  setPosts(pre => {
-    keys.forEach(key => {
-      if(pre[key]) delete pre[key]
-    })
-    return pre
-  })
-  setDelPosts(keys)
-}
-
-export const getPost = (x, y) => getPosts()[`post${x}_${y}`]
-export const setPost = (v) => setPosts((pre) => ({...pre, ...v}))
-
 export function core() {
+
+  post()
+  user()
 
   const peerManager = new PeerManager()
   let id
@@ -43,9 +26,7 @@ export function core() {
     if (!id) {
       id = uuid()
       await infra4({setLocal: id}).user.uid()
-      console.log(id)
     }
-    console.log(await infra4({getLocal: true}).user.uid())
     peerManager.myUserId = await infra4({getLocal: true}).user.uid()
   }, 100)
 
@@ -116,13 +97,6 @@ export function core() {
     addPost(postsObj)
   })
 
-  watchPosts(async(posts) => {
-    sendState({
-      posts: values(posts).flatMap(v => v['x.y'].map(v => Number(v))),
-      lums : values(posts).flatMap(v => v.l)
-    })
-  })
-
   watchCurrentArea(async() => {
     const [x, y] = getCamera()
     id && infra4(mutation).user.setLocate({
@@ -138,31 +112,6 @@ export function core() {
     peerManager.dcSendForAll()
   }, 5000)
 
-  setInterval(async() => {
-    const topic = getCurrentTopic()
-    if (!topic) return
-    const [xx, yy] = topic
-    const posts = infra4().post.get({xx, yy})
-
-    const [x, y] = getCamera()
-    id && infra4(mutation).user.setLocate({
-      id,
-      x,
-      y
-    })
-    const postsObj = aToO(await posts, (post) => {
-      const [, x, y] = post['t.x.y'].split('.')
-      return [
-        `post${x}_${y}`,
-        {
-          'x.y': [x, y],
-          m    : post.m
-        }
-      ]
-    })
-
-    addPost(postsObj)
-  }, 8000)// 人多い程更新頻度増やす？ tも有効に使う
 }
 
 //----------------------------------------------------------------

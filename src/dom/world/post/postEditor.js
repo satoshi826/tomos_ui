@@ -2,7 +2,7 @@ import {id} from '../../../../lib/dom'
 import {beforeend, addMultiEL, rmMultiEL} from '../../../../lib/dom'
 import {style} from '../../../../lib/theme'
 import {snippets as _} from '../../../theme/snippets'
-import {addPost} from '../../../core'
+import {addPost} from '../../../core/post'
 import {infra4, mutation} from '../../../infra'
 import {divider} from '../../common/divider'
 
@@ -92,13 +92,8 @@ const wrapperC = {
 }
 
 const editorFadein = {
-  from: {
-    ..._.transY('0px')
-  },
-  to: {
-    ..._.transY(`${-editorSize}px`)
-
-  }
+  from: _.transY('0px'),
+  to  : _.transY(`${-editorSize}px`)
 }
 
 const editorFadeout = {

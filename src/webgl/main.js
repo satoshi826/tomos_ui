@@ -7,8 +7,9 @@ import {setHandler, sendState} from '../../lib/glFrag/state'
 import {grid} from './shader/grid'
 import {post} from './shader/post'
 import {postLight} from './shader/postLight'
+import {user} from './shader/user'
 import {compose} from './shader/compose'
-import {plane} from './shape'
+import {plane, arrow} from './shape'
 
 export async function main(core) {
 
@@ -22,10 +23,13 @@ export async function main(core) {
     maxInstance        : 50000
   })
 
+  const arrowVAO = new Vao(core, arrow())
+
 
   const gridP = new Program(core, grid())
   const postP = new Program(core, post())
   const postLightP = new Program(core, postLight())
+  const userP = new Program(core, user())
 
   const basePixelRatio = ((core.pixelRatio > 1) ? 0.5 : 1) * core.pixelRatio
 
@@ -43,7 +47,7 @@ export async function main(core) {
     }})
 
   setHandler('cameraPosition', (cameraPosition) => {
-    [gridP, postP, postLightP].forEach(async(program) => program.set({cameraPosition}))
+    [gridP, postP, postLightP, userP].forEach(async(program) => program.set({cameraPosition}))
   })
 
   setHandler('posts', (posts) => {
@@ -62,6 +66,7 @@ export async function main(core) {
 
     gridRenderer.clear()
     gridRenderer.render(planeVAO, gridP)
+    gridRenderer.render(arrowVAO, userP)
 
     postsRenderer.clear()
     postsRenderer.render(postVAO, postP)
@@ -87,7 +92,6 @@ const initGl = (gl) => {
   gl.enable(gl.BLEND)
   gl.blendFunc(gl.ONE, gl.ONE)
   gl.depthMask(false)
-  // gl.colorMask(true, true, true, false)
   gl.getExtension('EXT_color_buffer_float')
   gl.getExtension('EXT_float_blend')
   gl.getExtension('OES_texture_half_float')

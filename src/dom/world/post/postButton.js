@@ -5,7 +5,8 @@ import {style, icon} from '../../../../lib/theme'
 import {snippets as _} from '../../../theme/snippets'
 import {domContainerEl, getTranslate} from '../domContainer'
 import {postionAdapter} from '../../canvas/util'
-import {getPost, watchCamera, setCamera, getCamera} from '../../../core'
+import {watchCamera, setCamera, getCamera} from '../../../core'
+import {getPost} from '../../../core/post'
 import {setEditPostMode} from '.'
 
 const setPostButton = (x, y) => {

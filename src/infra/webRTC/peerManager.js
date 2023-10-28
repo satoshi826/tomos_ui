@@ -1,7 +1,7 @@
 import {Peer} from '../../../lib/webRTC'
-import {partition, oForEach, oForEachV} from '../../../lib/util'
+import {partition, oForEach, oForEachV, oMap} from '../../../lib/util'
 import {infra4} from '..'
-import {getCurrentArea} from '../../core'
+import {getAddUsers} from '../../core/user'
 
 export class PeerManager {
   constructor({myUserId} = {}) {
@@ -9,9 +9,8 @@ export class PeerManager {
     this.myUserId = myUserId
   }
 
-  async getUsers() {
-    const [xxx, yyy] = getCurrentArea()
-    const users = await infra4({ttl: 5, diff: true}).user.getByLocate({xxx, yyy}) // updateでフィルタする
+  getUsers() {
+    const users = oMap(getAddUsers(), ([id, v]) => ({id, ...v}))
     return users?.filter(u => u.update + 5 * 60 * 1000 > Date.now()
     && u.id !== this.myUserId
     )
@@ -65,16 +64,15 @@ export class PeerManager {
 
   async signaling() {
     if(!this.myUserId) return null
-    this.getUsers().then(users => {
-      const [answererUsers, offererUsers] = partition(users, u => this.getImOfferer(u.id))
-      answererUsers.forEach(async u => {
-        const offererPeer = this.createPeer(u.id)
-        this.peerMap[u.id] ??= { //古くて未接続なら上書き？
-          key   : u.update,
-          status: 'offer_creating',
-          peer  : offererPeer
-        }
-      })
+    const users = this.getUsers()
+    const [answererUsers] = partition(users, u => this.getImOfferer(u.id))
+    answererUsers.forEach(async u => {
+      const offererPeer = this.createPeer(u.id)
+      this.peerMap[u.id] ??= { //古くて未接続なら上書き？
+        key   : u.update,
+        status: 'offer_creating',
+        peer  : offererPeer
+      }
     })
 
     this.getOffers().then((offers) => {

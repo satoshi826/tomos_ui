@@ -4,7 +4,7 @@ import {style} from '../../../../lib/theme'
 import {snippets as _} from '../../../theme/snippets'
 import {domContainerEl, getTranslate, BASE_SCALE} from '../domContainer'
 
-import {watchAddPosts} from '../../../core'
+import {watchAddPosts} from '../../../core/post'
 
 export function postItem() {
 
