@@ -84,7 +84,7 @@ export function core() {
     const [xx, yy] = topic
     const posts = await infra4().post.get({xx, yy})
     const postsObj = aToO(posts, (post) => {
-      const [, x, y] = post['t.x.y'].split('.')
+      const [, x, y] = post.t_x_y.split('_')
       return [
         `post${x}_${y}`,
         {

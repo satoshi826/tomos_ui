@@ -9,7 +9,7 @@ export const [watchAddPosts, setAddPosts, getAddPosts] = state({key: 'worldPosts
 export const [watchDelPosts, setDelPosts, getDelPosts] = state({key: 'worldPostsDel', init: {}})
 
 export const addPost = (posts) => {
-  setPosts(pre => ({...posts, ...pre}))
+  setPosts(pre => ({...pre, ...posts}))
   setAddPosts(posts)
 }
 
