@@ -69,26 +69,22 @@ export class PeerManager {
     const [answererUsers] = partition(users, u => this.getImOfferer(u.id))
     answererUsers.forEach(async u => {
       const offererPeer = this.createPeer(u.id)
-      assignWhen(this.peerMap[u.id], {
+      this.peerMap[u.id] ??= { //古くて未接続なら上書き？
         key   : u.update,
         status: 'offer_creating',
         peer  : offererPeer
-      },
-      !this.peerMap[u.id]
-      )
+      }
     })
 
     this.getOffers().then((offers) => {
       offers.forEach((offer) => {
         const answererPeer = this.createPeer(offer.pub)
-        assignWhen(this.peerMap[offer.pub], {
+        this.peerMap[offer.pub] ??= {
           key     : offer.key,
           status  : 'offer_received',
           peer    : answererPeer,
           offerSDP: offer.sdp
-        },
-        !this.peerMap[offer.pub]
-        )
+        }
       })
     })
 
