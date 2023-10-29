@@ -1,7 +1,8 @@
 import {infra4} from '../infra'
 import {state} from '../../lib/state'
 import {getCurrentArea, getCamera} from '.'
-import {aToO, isEmptyO} from '../../lib/util'
+import {aToO, isEmptyO, isExpiration, values} from '../../lib/util'
+import {sendState} from '../dom/canvas'
 
 export const [watchUsers, setUsers, getUsers] = state({key: 'worldUsers', init: {}})
 export const [watchAddUsers, setAddUsers, getAddUsers] = state({key: 'worldUsersAdd', init: {}})
@@ -34,7 +35,8 @@ export const user = () => {
   setInterval(async() => {
     const [xxx, yyy] = getCurrentArea()
     infra4({ttl: 1, diff: true}).user.getByLocate({xxx, yyy}).then(users => {
-      const usersObj = aToO(users, ({id, ...v}) => [id, v])
+      const filtered = users.filter(user => isExpiration(user.update, 60))
+      const usersObj = aToO(filtered, ({id, ...v}) => [id, v])
       !isEmptyO(usersObj) && addUser(usersObj)
     })
 
@@ -45,10 +47,11 @@ export const user = () => {
       y
     })
 
+
   }, 1000)
 
   watchUsers(users => {
-    console.log(users)
+    sendState({users: values(users).flatMap(v => v.x_y.split('_').map(v => Number(v)))})
   })
 
 }

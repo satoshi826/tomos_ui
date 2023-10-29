@@ -23,8 +23,12 @@ export async function main(core) {
     maxInstance        : 50000
   })
 
-  const arrowVAO = new Vao(core, arrow())
-
+  const userVAO = new Vao(core, {
+    ...arrow(),
+    id                 : 'user',
+    instancedAttributes: user().instancedAttributes,
+    maxInstance        : 500
+  })
 
   const gridP = new Program(core, grid())
   const postP = new Program(core, post())
@@ -57,8 +61,16 @@ export async function main(core) {
   })
 
   setHandler('lums', (lums) => {
+    // console.log(lums)
     postVAO.setInstancedValues({
       a_instance_postLuminance: lums
+    })
+  })
+
+  setHandler('users', (users) => {
+    // console.log(users)
+    userVAO.setInstancedValues({
+      a_instance_userPosition: users
     })
   })
 
@@ -66,7 +78,7 @@ export async function main(core) {
 
     gridRenderer.clear()
     gridRenderer.render(planeVAO, gridP)
-    gridRenderer.render(arrowVAO, userP)
+    gridRenderer.render(userVAO, userP)
 
     postsRenderer.clear()
     postsRenderer.render(postVAO, postP)
