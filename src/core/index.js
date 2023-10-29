@@ -4,7 +4,7 @@ import {aToO, range, random, uuid} from '../../lib/util'
 import {infra4, mutation} from '../infra'
 import {PeerManager} from '../infra/webRTC/peerManager'
 import {addPost, post} from './post'
-import {user} from './user'
+import {user, getId} from './user'
 
 const initCamera = [0, 0, 5]
 export const [watchCamera, setCamera, getCamera] = state({key: 'cameraPosition', init: initCamera})
@@ -17,12 +17,10 @@ export function core() {
   user()
 
   const peerManager = new PeerManager()
-  let id
 
   setTimeout(async() => {
 
-    id = await infra4({getLocal: true}).user.uid()
-    console.log(id)
+    let id = getId()
     if (!id) {
       id = uuid()
       await infra4({setLocal: id}).user.uid()
@@ -32,6 +30,8 @@ export function core() {
 
   watchCamera((cameraPosition) => {
     sendState({cameraPosition})
+
+    peerManager.dcSendForAll(cameraPosition)
 
     const [curXX, curYY] = getCurrentTopic() ?? [null, null]
     const [curXXX, curYYY] = getCurrentArea() ?? [null, null]
@@ -99,8 +99,8 @@ export function core() {
 
   watchCurrentArea(async() => {
     const [x, y] = getCamera()
-    id && infra4(mutation).user.setLocate({
-      id,
+    getId() && infra4(mutation).user.setLocate({
+      id: getId(),
       x,
       y
     })
@@ -109,7 +109,7 @@ export function core() {
   setInterval(async() => {
     console.log(peerManager)
     peerManager.signaling()
-    peerManager.dcSendForAll()
+    peerManager.dcSendForAll({from: getId(), value: 'hoge'})
   }, 5000)
 
 }

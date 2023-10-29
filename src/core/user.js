@@ -9,6 +9,7 @@ export const [watchAddUsers, setAddUsers, getAddUsers] = state({key: 'worldUsers
 export const [watchDelUsers, setDelUsers, getDelUsers] = state({key: 'worldUsersDel', init: {}})
 
 export let id
+export const getId = () => id
 
 export const addUser = (posts) => {
   console.log()

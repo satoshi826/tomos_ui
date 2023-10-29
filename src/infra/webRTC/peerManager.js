@@ -42,10 +42,10 @@ export class PeerManager {
     throw 'override me'
   }
 
-  async dcSendForAll() {
+  async dcSendForAll(value) {
     oForEachV(this.peerMap, ({peer, status}) => {
       if (status === 'connected') {
-        peer.dc.send('iam ' + this.myUserId)
+        peer.dc.send({from: this.myUserId, value})
       }
     })
   }

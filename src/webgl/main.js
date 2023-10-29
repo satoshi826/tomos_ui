@@ -61,14 +61,12 @@ export async function main(core) {
   })
 
   setHandler('lums', (lums) => {
-    // console.log(lums)
     postVAO.setInstancedValues({
       a_instance_postLuminance: lums
     })
   })
 
   setHandler('users', (users) => {
-    // console.log(users)
     userVAO.setInstancedValues({
       a_instance_userPosition: users
     })
