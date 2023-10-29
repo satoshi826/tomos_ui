@@ -1,5 +1,5 @@
 import {Peer} from '../../../lib/webRTC'
-import {partition, oForEach, oForEachV, oMap, isExpiration, assignWhen} from '../../../lib/util'
+import {partition, oForEach, oForEachV, oMap, isExpiration} from '../../../lib/util'
 import {infra4} from '..'
 import {getAddUsers} from '../../core/user'
 
