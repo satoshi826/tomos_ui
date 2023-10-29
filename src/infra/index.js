@@ -1,4 +1,4 @@
-import {isNil, oMapO, oForEach, oForEachV, oForEachK, arrayed, deepEquals} from '../../lib/util'
+import {isNil, oMapO, oForEach, oForEachV, oForEachK, arrayed, deepEquals, isExpiration} from '../../lib/util'
 import {cache} from './cashe'
 import {Fetcher} from '../../lib/fetch'
 import {API_ENDPOINT} from '../../constants'
@@ -103,7 +103,7 @@ export const infra4 = ({ttl, throttle, setLocal, getLocal, parallel, series, dif
       if (getLocal || ttl || throttle) {
         cacheObject = await cache.get({type, method, args: throttle ? null : args})
         if (!isNil(cacheObject)) {
-          if (cacheObject.timestamp + (throttle ?? ttl ?? 0) * 1000 > Date.now()) {
+          if (isExpiration(cacheObject.timestamp, (throttle ?? ttl ?? 0))) {
             console.debug('cache hit!', type, method, args, cacheObject)
             return cacheObject.value
           }

@@ -3,6 +3,7 @@ import {sendState} from '../dom/canvas'
 import {aToO, values} from '../../lib/util'
 import {infra4, mutation} from '../infra'
 import {getCurrentTopic, getCamera} from '.'
+import {id} from './user'
 
 export const [watchPosts, setPosts, getPosts] = state({key: 'worldPosts', init: {}}) // 描画対象のみ
 export const [watchAddPosts, setAddPosts, getAddPosts] = state({key: 'worldPostsAdd', init: {}})
@@ -41,7 +42,6 @@ export const post = () => {
     const [xx, yy] = topic
     const posts = infra4().post.get({xx, yy})
     const [x, y] = getCamera()
-    const id = await infra4({getLocal: true}).user.uid()
     id && infra4(mutation).user.setLocate({
       id,
       x,

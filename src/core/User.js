@@ -7,6 +7,8 @@ export const [watchUsers, setUsers, getUsers] = state({key: 'worldUsers', init: 
 export const [watchAddUsers, setAddUsers, getAddUsers] = state({key: 'worldUsersAdd', init: {}})
 export const [watchDelUsers, setDelUsers, getDelUsers] = state({key: 'worldUsersDel', init: {}})
 
+export let id
+
 export const addUser = (posts) => {
   console.log()
   setUsers(pre => ({...pre, ...posts}))
@@ -25,6 +27,10 @@ export const delUser = (keys) => {
 
 export const user = () => {
 
+  queueMicrotask(async() => {
+    id = await infra4({getLocal: true}).user.uid()
+  })
+
   setInterval(async() => {
     const [xxx, yyy] = getCurrentArea()
     infra4({ttl: 1, diff: true}).user.getByLocate({xxx, yyy}).then(users => {
@@ -33,12 +39,12 @@ export const user = () => {
     })
 
     const [x, y] = getCamera()
-    const id = await infra4({getLocal: true}).user.uid()
     id && infra4({throttle: 1}).user.setLocate({
       id,
       x,
       y
     })
+
   }, 1000)
 
   watchUsers(users => {

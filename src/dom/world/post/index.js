@@ -1,6 +1,6 @@
 import {state} from '../../../../lib/state'
 
-import {postItem} from './postItem'
+// import {postItem} from './postItem'
 import {postButton} from './postButton'
 import {postEditor} from './postEditor'
 
