@@ -1,6 +1,6 @@
 import {state} from '../../lib/state'
 import {sendState} from '../dom/canvas'
-import {aToO, range, random, uuid} from '../../lib/util'
+import {aToO, range, random} from '../../lib/util'
 import {infra4, mutation} from '../infra'
 import {PeerManager} from '../infra/webRTC/peerManager'
 import {addPost, post} from './post'
@@ -11,27 +11,20 @@ export const [watchCamera, setCamera, getCamera] = state({key: 'cameraPosition',
 export const [watchCurrentTopic, setCurrentTopic, getCurrentTopic] = state({key: 'currentTopic', init: [0, 0]})
 export const [watchCurrentArea, setCurrentArea, getCurrentArea] = state({key: 'currentArea', init: [0, 0]})
 
+export let peerManager
+
 export function core() {
 
   post()
   user()
 
-  const peerManager = new PeerManager()
-
-  setTimeout(async() => {
-
-    let id = getId()
-    if (!id) {
-      id = uuid()
-      await infra4({setLocal: id}).user.uid()
-    }
-    peerManager.myUserId = await infra4({getLocal: true}).user.uid()
-  }, 100)
+  queueMicrotask(async() => {
+    peerManager = new PeerManager({myUserId: await getId()})
+  })
 
   watchCamera((cameraPosition) => {
     sendState({cameraPosition})
-
-    peerManager.dcSendForAll(cameraPosition)
+    peerManager?.dcSendForAll({type: 'userPos', value: [cameraPosition[0], cameraPosition[1]]})
 
     const [curXX, curYY] = getCurrentTopic() ?? [null, null]
     const [curXXX, curYYY] = getCurrentArea() ?? [null, null]
@@ -48,7 +41,6 @@ export function core() {
       console.log(xxx, yyy)
       setCurrentArea([xxx, yyy])
     }
-
 
     if (z > 500) {
       if(curXX !== null) setCurrentTopic(null)
@@ -108,9 +100,8 @@ export function core() {
 
   setInterval(async() => {
     console.log(peerManager)
-    peerManager.signaling()
-    peerManager.dcSendForAll({from: getId(), value: 'hoge'})
-  }, 5000)
+    peerManager?.signaling()
+  }, 5000) // 個々の頻度あげる？
 
 }
 

@@ -1,5 +1,6 @@
+/* eslint-disable no-unsafe-optional-chaining */
 import {Peer} from '../../../lib/webRTC'
-import {partition, oForEach, oForEachV, oMap, isExpiration} from '../../../lib/util'
+import {partition, oForEach, oForEachV, oMap, isExpiration, override} from '../../../lib/util'
 import {infra4} from '..'
 import {getAddUsers} from '../../core/user'
 
@@ -7,6 +8,16 @@ export class PeerManager {
   constructor({myUserId} = {}) {
     this.peerMap = {}
     this.myUserId = myUserId
+    this.messageHandler = {}
+  }
+
+  addMessageHandler(type, func) {
+    this.messageHandler[type] ??= []
+    this.messageHandler[type].push(func)
+  }
+
+  dispatch({type, from, value}) {
+    this.messageHandler[type]?.forEach(f => f({from, value}))
   }
 
   getUsers() {
@@ -42,10 +53,10 @@ export class PeerManager {
     throw 'override me'
   }
 
-  async dcSendForAll(value) {
+  async dcSendForAll({type, value}) {
     oForEachV(this.peerMap, ({peer, status}) => {
       if (status === 'connected') {
-        peer.dc.send({from: this.myUserId, value})
+        peer.sendMessage(`${type}_${JSON.stringify(value)}`)
       }
     })
   }
@@ -56,9 +67,27 @@ export class PeerManager {
 
   createPeer(id) {
     const peer = new Peer()
-    peer.onDataChannelOpen = () => this.peerMap[id].status = 'connected'
-    peer.onDataChannelClose = () => delete this.peerMap[id]
-    peer.onDataChannelError = () => delete this.peerMap[id]
+    override(peer, 'onDataChannelOpen', (prevF, ...args) => {
+      prevF(...args)
+      this.peerMap[id].status = 'connected'
+    })
+    override(peer, 'onDataChannelClose', (prevF, ...args) => {
+      prevF(...args)
+      delete this.peerMap[id]
+    })
+    override(peer, 'onDataChannelError', (prevF, ...args) => {
+      prevF(...args)
+      delete this.peerMap[id]
+    })
+    override(peer, 'onDataChannelMessage', (prevF, ...args) => {
+      prevF(args)
+      const [type, value] = args?.[0]?.data?.slice(1, -1).split('_') ?? [null, null]
+      this.dispatch({type, from: id, value: JSON.parse(value)})
+    })
+    override(peer, 'onConnectionStateChange', (prevF, ...args) => {
+      prevF(args)
+      if (['closed', 'failed', 'disconnected'].includes(args[0].target.connectionState)) delete this.peerMap[id]
+    })
     return peer
   }
 

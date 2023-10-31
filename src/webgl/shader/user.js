@@ -14,7 +14,7 @@ export const user = () => ({
 
   vert: /* glsl */`#version 300 es
   layout(location = 0) in vec3 a_position;
-  layout(location = 4) in float a_instance_userPosition;
+  layout(location = 4) in vec2 a_instance_userPosition;
   uniform   vec2  resolution;
   uniform   vec3  cameraPosition;
   void main(void){
