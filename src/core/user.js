@@ -9,6 +9,15 @@ export const [watchAddUsers, setAddUsers, getAddUsers] = state({key: 'worldUsers
 export const [watchDelUsers, setDelUsers, getDelUsers] = state({key: 'worldUsersDel', init: {}})
 
 export let id
+infra4({getLocal: true}).user.uid().then(uid => {
+  if(uid) id = uid
+  else{
+    id = uuid()
+    infra4({setLocal: id}).user.uid()
+  }
+})
+
+
 export const getId = () => new Promise((resolve) => {
   if (id) resolve(id)
   else {
@@ -38,14 +47,6 @@ export const delUser = (keys) => {
 
 export const user = () => {
 
-  infra4({getLocal: true}).user.uid().then(uid => {
-    if(uid) id = uid
-    else{
-      id = uuid()
-      infra4({setLocal: id}).user.uid()
-    }
-  })
-
   setTimeout(() => {
     peerManager.addMessageHandler('userPos', ({from, value}) => {
       addUser({
@@ -54,7 +55,6 @@ export const user = () => {
         }
       })
     })
-
   }, 500)
 
   setInterval(async() => {
@@ -62,8 +62,7 @@ export const user = () => {
     infra4({ttl: 1, diff: true}).user.getByLocate({xxx, yyy}).then(users => {
       const filtered = users.filter(user => isExpiration(user.update, 30))
       const usersObj = aToO(filtered, ({id, ...v}) => [id, v])
-      console.log(usersObj)
-      !isEmptyO(usersObj) && addUser(usersObj)
+      !isEmptyO(usersObj) && addUser(usersObj)// RTCは除く
     })
 
     const [x, y] = getCamera()

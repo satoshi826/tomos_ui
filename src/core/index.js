@@ -14,13 +14,14 @@ export const [watchCurrentArea, setCurrentArea, getCurrentArea] = state({key: 'c
 export let peerManager
 
 export function core() {
-
   post()
   user()
+  getId().then(id => peerManager = new PeerManager({myUserId: id}))
 
-  queueMicrotask(async() => {
-    peerManager = new PeerManager({myUserId: await getId()})
-  })
+  setInterval(async() => {
+    console.log(peerManager)
+    peerManager?.signaling()
+  }, 5000)
 
   watchCamera((cameraPosition) => {
     sendState({cameraPosition})
@@ -97,11 +98,6 @@ export function core() {
       y
     })
   })
-
-  setInterval(async() => {
-    console.log(peerManager)
-    peerManager?.signaling()
-  }, 5000) // 個々の頻度あげる？
 
 }
 
