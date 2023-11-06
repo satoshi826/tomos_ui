@@ -18,11 +18,6 @@ export function core() {
   user()
   getId().then(id => peerManager = new PeerManager({myUserId: id}))
 
-  setInterval(async() => {
-    console.log(peerManager)
-    peerManager?.signaling()
-  }, 5000)
-
   watchCamera((cameraPosition) => {
     sendState({cameraPosition})
     peerManager?.dcSendForAll({type: 'userPos', value: [cameraPosition[0], cameraPosition[1]]})

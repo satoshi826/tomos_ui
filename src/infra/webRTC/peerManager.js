@@ -4,11 +4,16 @@ import {partition, oForEach, oForEachV, oMap, isExpiration, override} from '../.
 import {infra4} from '..'
 import {getAddUsers} from '../../core/user'
 
+const DEFAULT_INTERVAL = 5000
+
 export class PeerManager {
   constructor({myUserId} = {}) {
     this.peerMap = {}
     this.myUserId = myUserId
     this.messageHandler = {}
+    this.signalingInterval = DEFAULT_INTERVAL
+    this.signalingLoop()
+    this.signalingLoopId = null
   }
 
   addMessageHandler(type, func) {
@@ -28,12 +33,12 @@ export class PeerManager {
   }
 
   async getOffers() {
-    const notif = await infra4({ttl: 5, series: true, diff: true}).notification.pull({sub: this.myUserId}) // updateでフィルタする
+    const notif = await infra4({ttl: 1, series: true, diff: true}).notification.pull({sub: this.myUserId}) // updateでフィルタする
     return notif.filter(({type, time}) => type === 'offerSDP' && isExpiration(time, 300))
   }
 
   async getAnswers() {
-    const notif = await infra4({ttl: 5, series: true, diff: true}).notification.pull({sub: this.myUserId})
+    const notif = await infra4({ttl: 1, series: true, diff: true}).notification.pull({sub: this.myUserId})
     return notif.filter(({type, time}) => type === 'answerSDP' && isExpiration(time, 300))
   }
 
@@ -65,7 +70,19 @@ export class PeerManager {
     return userId && userId > this.myUserId
   }
 
+  deletePeer(id) {
+    if(this.peerMap[id] && this.peerMap[id].status !== 'closed') {
+      console.log('deletePeer', id)
+      this.peerMap[id].status = 'closed'
+      this.peerMap[id].peer = null
+      delete this.peerMap[id]
+      console.log(this.peerMap)
+    }
+
+  }
+
   createPeer(id) {
+    console.log('createPeer!!!!!!!!!!')
     const peer = new Peer()
     override(peer, 'onDataChannelOpen', (prevF, ...args) => {
       prevF(...args)
@@ -73,46 +90,95 @@ export class PeerManager {
     })
     override(peer, 'onDataChannelClose', (prevF, ...args) => {
       prevF(...args)
-      delete this.peerMap[id]
+      this.deletePeer(id)
     })
     override(peer, 'onDataChannelError', (prevF, ...args) => {
       prevF(...args)
-      delete this.peerMap[id]
+      this.deletePeer(id)
     })
     override(peer, 'onDataChannelMessage', (prevF, ...args) => {
       prevF(args)
       const [type, value] = args?.[0]?.data?.slice(1, -1).split('_') ?? [null, null]
       this.dispatch({type, from: id, value: JSON.parse(value)})
     })
-    override(peer, 'onConnectionStateChange', (prevF, ...args) => {
+    override(peer.pc, 'onconnectionstatechange', (prevF, ...args) => {
+      console.log(args[0].target.connectionState)
+      if (['closed', 'failed', 'disconnected'].includes(args[0].target.connectionState)) {
+        this.deletePeer(id)
+      }
       prevF(args)
-      if (['closed', 'failed', 'disconnected'].includes(args[0].target.connectionState)) delete this.peerMap[id]
     })
     return peer
+  }
+
+  signalingLoop() {
+    this.signaling()
+    console.log(this.peerMap)
+    console.log(this.signalingInterval)
+    this.signalingLoopId = setTimeout(() => this.signalingLoop(), this.signalingInterval)
+  }
+
+  stopSignalingLoop() {
+    clearTimeout(this.signalingLoopId)
+  }
+
+  resetInterval() {
+    this.signalingInterval = DEFAULT_INTERVAL
   }
 
   async signaling() {
     if(!this.myUserId) return null
     const users = this.getUsers()
 
-    const [answererUsers] = partition(users, u => this.getImOfferer(u.id))
+    let activeLoop = false
+    oForEachV(this.peerMap, ({status}) => {
+      if (['offer_sent', 'offer_waiting'].includes(status)) {
+        activeLoop = true
+      }
+    })
+    if (activeLoop) {
+      if(this.signalingInterval === DEFAULT_INTERVAL) {
+        console.log('hoge')
+        this.signalingInterval = 1000
+      }
+    }else if (this.signalingInterval !== DEFAULT_INTERVAL) {
+      console.log('fuga')
+      this.resetInterval()
+    }
+
+
+    const [answererUsers, offererUsers] = partition(users, u => this.getImOfferer(u.id))
     answererUsers.forEach(async u => {
-      const offererPeer = this.createPeer(u.id)
-      this.peerMap[u.id] ??= { //古くて未接続なら上書き？
-        key   : u.update,
-        status: 'offer_creating',
-        peer  : offererPeer
+      if (!this.peerMap[u.id] ||
+          (!this.peerMap?.[u.id].status === 'connected' && isExpiration(this.peerMap?.[u.id].update, 30))) {
+        this.peerMap[u.id] = { //古くて未接続なら上書き？
+          key   : u.update,
+          status: 'offer_creating',
+          peer  : this.createPeer(u.id)
+        }
+      }
+    })
+
+    offererUsers.forEach(async u => {
+      if (!this.peerMap[u.id] ||
+          (!this.peerMap?.[u.id].status === 'connected' && isExpiration(this.peerMap?.[u.id].update, 30))) {
+        this.peerMap[u.id] = { //古くて未接続なら上書き？
+          key   : u.update,
+          status: 'offer_waiting'
+        }
       }
     })
 
     this.getOffers().then((offers) => {
       offers.forEach((offer) => {
-        const answererPeer = this.createPeer(offer.pub)
-        this.peerMap[offer.pub] ??= {
-          key     : offer.key,
-          status  : 'offer_received',
-          peer    : answererPeer,
-          offerSDP: offer.sdp
+        if (!this.peerMap[offer.id] ||
+            (!this.peerMap?.[offer.id].status === 'connected' && isExpiration(this.peerMap?.[offer.id].update, 30))) {
+          this.peerMap[offer.pub] = {
+            key     : offer.key,
+            status  : 'offer_received',
+            peer    : this.createPeer(offer.pub),
+            offerSDP: offer.sdp
+          }
         }
       })
     })
@@ -132,25 +198,29 @@ export class PeerManager {
         v.status = 'offer_sending'
         v.peer.createOfferSdp()
           .then(() => this.sendOffer({id, key: v.key, sdp: v.peer.localSDP}))
+          .then(console.log)
           .then(() => v.status = 'offer_sent')
           .catch((error) => {
             console.error(error)
             v.status = 'offer_send_failed'
+            this.resetInterval(v.status)
           })
       }
       if (v.status === 'offer_received') {
         v.status = 'answer_sending'
         v.peer.setOfferSdp(v.offerSDP)
           .then(() => this.sendAnswer({id, key: v.key, sdp: v.peer.localSDP}))
+          .then(console.log)
           .then(() => v.status = 'answer_sent')
           .catch((error) => {
             console.error(error)
             v.status = 'answer_send_failed'
+            this.resetInterval(v.status)
           })
       }
     })
 
-
   }
+
 
 }

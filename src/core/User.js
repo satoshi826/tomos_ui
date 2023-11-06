@@ -59,7 +59,7 @@ export const user = () => {
 
   setInterval(async() => {
     const [xxx, yyy] = getCurrentArea()
-    infra4({ttl: 1, diff: true}).user.getByLocate({xxx, yyy}).then(users => {
+    infra4({ttl: 2, diff: true}).user.getByLocate({xxx, yyy}).then(users => {
       const filtered = users.filter(user => isExpiration(user.update, 30))
       const usersObj = aToO(filtered, ({id, ...v}) => [id, v])
       !isEmptyO(usersObj) && addUser(usersObj)// RTCは除く
@@ -68,7 +68,7 @@ export const user = () => {
     const [x, y] = getCamera()
     id && infra4({throttle: 1}).user.setLocate({id, x, y})
     //定期的に古いの削除する
-  }, 1000)
+  }, 5000)
 
   watchUsers(users => {
     sendState({users: values(users).flatMap(({x_y}) => x_y.split('_').map(v => Number(v)))})

@@ -41,12 +41,6 @@ export const post = () => {
     if (!topic) return
     const [xx, yy] = topic
     const posts = infra4().post.get({xx, yy})
-    const [x, y] = getCamera()
-    id && infra4(mutation).user.setLocate({
-      id,
-      x,
-      y
-    })
     const postsObj = aToO(await posts, (post) => {
       const [, x, y] = post.t_x_y.split('_')
       return [
