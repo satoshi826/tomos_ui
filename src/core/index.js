@@ -89,8 +89,8 @@ export function core() {
     const [x, y] = getCamera()
     getId() && infra4(mutation).user.setLocate({
       id: getId(),
-      x,
-      y
+      x : x.toFixed(3),
+      y : y.toFixed(3)
     })
   })
 

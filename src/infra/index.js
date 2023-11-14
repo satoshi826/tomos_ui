@@ -47,6 +47,7 @@ const setFetchTimer = () => {
       )
       console.debug('fetch result', result)
     } catch (err) {
+      console.error(err)
       oForEachV(fetchQueue, (methods) =>
         oForEachV(methods, (v) => arrayed(v).forEach(({reject}) => reject()))
       )

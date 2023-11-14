@@ -4,7 +4,9 @@ import {partition, oForEach, oForEachV, oMap, isExpiration, override} from '../.
 import {infra4} from '..'
 import {getAddUsers} from '../../core/user'
 
+let peerCount = 0
 const DEFAULT_INTERVAL = 5000
+const MAX_PEER = 10
 
 export class PeerManager {
   constructor({myUserId} = {}) {
@@ -12,8 +14,8 @@ export class PeerManager {
     this.myUserId = myUserId
     this.messageHandler = {}
     this.signalingInterval = DEFAULT_INTERVAL
-    this.signalingLoop()
     this.signalingLoopId = null
+    this.signalingLoop()
   }
 
   addMessageHandler(type, func) {
@@ -62,6 +64,7 @@ export class PeerManager {
     oForEachV(this.peerMap, ({peer, status}) => {
       if (status === 'connected') {
         peer.sendMessage(`${type}_${JSON.stringify(value)}`)
+        // console.log(peer, value)
       }
     })
   }
@@ -83,6 +86,8 @@ export class PeerManager {
 
   createPeer(id) {
     console.log('createPeer!!!!!!!!!!')
+    peerCount++
+    console.log({peerCount})
     const peer = new Peer()
     override(peer, 'onDataChannelOpen', (prevF, ...args) => {
       prevF(...args)
@@ -131,18 +136,16 @@ export class PeerManager {
     const users = this.getUsers()
 
     let activeLoop = false
-    oForEachV(this.peerMap, ({status}) => {
-      if (['offer_sent', 'offer_waiting'].includes(status)) {
+    oForEachV(this.peerMap, ({status, key}) => {
+      if (['offer_sent', 'offer_waiting'].includes(status) && isExpiration(key, 15)) {
         activeLoop = true
       }
     })
     if (activeLoop) {
       if(this.signalingInterval === DEFAULT_INTERVAL) {
-        console.log('hoge')
         this.signalingInterval = 1000
       }
     }else if (this.signalingInterval !== DEFAULT_INTERVAL) {
-      console.log('fuga')
       this.resetInterval()
     }
 
@@ -150,7 +153,7 @@ export class PeerManager {
     const [answererUsers, offererUsers] = partition(users, u => this.getImOfferer(u.id))
     answererUsers.forEach(async u => {
       if (!this.peerMap[u.id] ||
-          (!this.peerMap?.[u.id].status === 'connected' && isExpiration(this.peerMap?.[u.id].update, 30))) {
+          (!this.peerMap?.[u.id].status === 'connected' && isExpiration(this.peerMap?.[u.id].key, 30))) {
         this.peerMap[u.id] = { //古くて未接続なら上書き？
           key   : u.update,
           status: 'offer_creating',
@@ -161,9 +164,8 @@ export class PeerManager {
 
     offererUsers.forEach(async u => {
       if (!this.peerMap[u.id] ||
-          (!this.peerMap?.[u.id].status === 'connected' && isExpiration(this.peerMap?.[u.id].update, 30))) {
+          (!this.peerMap?.[u.id].status === 'connected' && isExpiration(this.peerMap?.[u.id].key, 30))) {
         this.peerMap[u.id] = { //古くて未接続なら上書き？
-          key   : u.update,
           status: 'offer_waiting'
         }
       }

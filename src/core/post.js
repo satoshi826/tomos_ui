@@ -1,9 +1,8 @@
 import {state} from '../../lib/state'
 import {sendState} from '../dom/canvas'
 import {aToO, values} from '../../lib/util'
-import {infra4, mutation} from '../infra'
-import {getCurrentTopic, getCamera} from '.'
-import {id} from './user'
+import {infra4} from '../infra'
+import {getCurrentTopic} from '.'
 
 export const [watchPosts, setPosts, getPosts] = state({key: 'worldPosts', init: {}}) // 描画対象のみ
 export const [watchAddPosts, setAddPosts, getAddPosts] = state({key: 'worldPostsAdd', init: {}})
