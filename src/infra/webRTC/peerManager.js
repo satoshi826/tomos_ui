@@ -15,7 +15,6 @@ export class PeerManager {
     this.messageHandler = {}
     this.signalingInterval = DEFAULT_INTERVAL
     this.signalingLoopId = null
-    this.signalingLoop()
   }
 
   addMessageHandler(type, func) {
@@ -120,7 +119,7 @@ export class PeerManager {
     this.signaling()
     console.log(this.peerMap)
     console.log(this.signalingInterval)
-    this.signalingLoopId = setTimeout(() => this.signalingLoop(), this.signalingInterval)
+    this.signalingLoopId = setTimeout(() => this.signalingLoop(), this.signalingInterval) //
   }
 
   stopSignalingLoop() {

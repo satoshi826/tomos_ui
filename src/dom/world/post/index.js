@@ -8,6 +8,6 @@ export const [watchEditPostMode, setEditPostMode, getEditPostMode] = state({key:
 
 export function init() {
   // postItem()
-  postButton()
+  // postButton()
   postEditor()
 }

@@ -18,7 +18,7 @@ export function domContainer() {
   const canvasWrapper = id('canvasWrapper')
   canvasWrapper.appendChild(domContainerEl)
 
-  requestAnimationFrame(() => {
+  queueMicrotask(() => {
 
     watchCamera((camera) => {
       setContainer(domContainerEl, camera)

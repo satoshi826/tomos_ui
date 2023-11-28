@@ -29,7 +29,7 @@ const navBarC = {
 
 const iconButton = ({name, handler}) => {
 
-  requestAnimationFrame(() => {
+  queueMicrotask(() => {
     if(handler) {
       const iconbutton = id(`${name}iconbutton`)
       iconbutton._on.click = handler

@@ -51,7 +51,12 @@ export async function main(core) {
     }})
 
   setHandler('cameraPosition', (cameraPosition) => {
-    [gridP, postP, postLightP, userP].forEach(async(program) => program.set({cameraPosition}))
+    [gridP, postP, postLightP, userP].forEach((program) => program.set({cameraPosition}))
+  })
+
+  setHandler('mouse', (mouse) => {
+    console.log(mouse)
+    gridP.set({mouse})
   })
 
   setHandler('posts', (posts) => {
@@ -76,13 +81,13 @@ export async function main(core) {
 
     gridRenderer.clear()
     gridRenderer.render(planeVAO, gridP)
-    gridRenderer.render(userVAO, userP)
+    gridRenderer.renderInstanced(userVAO, userP)
 
     postsRenderer.clear()
-    postsRenderer.render(postVAO, postP)
+    postsRenderer.renderInstanced(postVAO, postP)
 
     postLightsRenderer.clear()
-    postLightsRenderer.render(postVAO, postLightP)
+    postLightsRenderer.renderInstanced(postVAO, postLightP)
 
     renderer.render(planeVAO, composeP)
   }, interval: 0})
@@ -91,11 +96,6 @@ export async function main(core) {
   setInterval(() => sendState({drawTime: Number(animation.drawTime).toFixed(2) + ' ms', fps: Number(1000 / animation.delta).toFixed(2)}), 200)
 }
 
-// setHandler('mouse', (mouse) => {
-//   const x = mouse?.x ?? 0
-//   const y = mouse?.y ?? 0
-//   testF.set({mouse: [x, y]})
-// })
 
 const initGl = (gl) => {
   gl.disable(gl.DEPTH_TEST)

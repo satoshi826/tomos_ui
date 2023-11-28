@@ -4,7 +4,7 @@ import {snippets as _} from '../../theme/snippets'
 
 export function button({id = crypto.randomUUID(), css, onClick, onSuccess, onError, text}) {
 
-  requestAnimationFrame(() => {
+  queueMicrotask(() => {
     getEl(id).onclick = onClick
     style.set('.button', buttonC, {once: true})
     style.hover('.button', buttonHoverC, {once: true})

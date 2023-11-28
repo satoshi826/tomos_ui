@@ -26,7 +26,7 @@ export const post = () => ({
     void main(void){
       float zoom = cameraPosition.z/2.;
       float aspect = resolution.y / resolution.x;
-      float scale = .25;
+      float scale = .2;
       vec2 a = (1.0 < aspect) ? vec2(1.0, 1.0 / aspect) : vec2(aspect, 1.0);
       o_textureCoord = a_textureCoord;
       o_postLuminance = a_instance_postLuminance;
@@ -50,7 +50,8 @@ export const post = () => ({
 
     void main(void){
       float len = length(CENTER - o_textureCoord);
-      float point = (0.1+logY(10.,o_postLuminance+1.))*(1.-smoothstep(.4, .5, len));
+      // float point = (0.1+logY(10.,o_postLuminance+1.))*(1.-smoothstep(.4, .5, len));
+      float point = logY(10.,o_postLuminance+1.);
       outColor = vec4(vec3(point),1.);
     }`
 

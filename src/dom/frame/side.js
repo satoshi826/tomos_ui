@@ -6,8 +6,8 @@ import {deviceState} from '../../theme/init'
 
 export function side(content = 'sidebar') {
 
-  requestAnimationFrame(toggleSideber)
-  requestAnimationFrame(dragSideber)
+  queueMicrotask(toggleSideber)
+  queueMicrotask(dragSideber)
 
   style.set('#sidebar', style.isDevice('mobile') ? closedSideBarC : sideBarC)
   style.responsive('mobile')('#sidebar', sideBarMobileC)

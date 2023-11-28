@@ -18,9 +18,6 @@ export const user = () => ({
   uniform   vec2  resolution;
   uniform   vec3  cameraPosition;
   void main(void){
-
-    vec2 pos = vec2(0.,0.);
-
     float zoom = cameraPosition.z/2.;
     float aspect = resolution.y / resolution.x;
     float scale = .25;

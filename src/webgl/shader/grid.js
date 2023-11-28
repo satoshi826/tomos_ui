@@ -4,7 +4,8 @@ export const grid = () => ({
 
   uniformTypes: {
     resolution    : 'vec2',
-    cameraPosition: 'vec3'
+    cameraPosition: 'vec3',
+    mouse         : 'vec2'
   },
 
   vert: /* glsl */`#version 300 es
@@ -19,6 +20,7 @@ export const grid = () => ({
 
     uniform   vec2  resolution;
     uniform   vec3  cameraPosition;
+    uniform   vec2  mouse;
     out vec4 outColor;
 
     const float GRID_POWER = 2.0;
@@ -46,6 +48,14 @@ export const grid = () => ({
       return grids;
     }
 
+    float getRect(vec2 currentP, vec2 mousePosSteped, float scale){
+      float margin = scale*.5;
+      float rect =
+      2.*step(1.5, smoothstep(.47, 1.-abs(mousePosSteped.x+margin-currentP.x), 1.)+smoothstep(.47, 1.-abs(mousePosSteped.y+margin-currentP.y), 1.)
+                -0.5*(smoothstep(.52, 1.-abs(mousePosSteped.x+margin-currentP.x), 1.)+smoothstep(.52, 1.-abs(mousePosSteped.y+margin-currentP.y), 1.)) );
+      return rect;
+    }
+
     void main(void){
 
       float aspect = resolution.x / resolution.y;
@@ -54,7 +64,14 @@ export const grid = () => ({
       vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
       vec2 currentP = (scale * .5 * p) + cameraPosition.xy;
       float grids = getGrids(currentP, scale);
-      outColor = vec4(vec3(grids), 1.);
+
+      vec2 aspectedMouse = a*mouse;
+      vec2 mousePos = (aspectedMouse * scale * .5) + cameraPosition.xy;
+      vec2 mousePosSteped = floor(mousePos);
+      float rect = getRect(currentP, mousePosSteped, 1.);
+      float rect2 = getRect(currentP, mousePosSteped, 10.);
+
+      outColor = vec4(vec3(grids+rect+rect2), 1.);
     }`
 
 })

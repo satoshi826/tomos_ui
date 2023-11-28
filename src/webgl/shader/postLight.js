@@ -53,7 +53,7 @@ export const postLight = () => ({
 
     void main(void){
       float len = length(CENTER - o_textureCoord)*o_scale;
-      float light = (.0005*log2(o_postLuminance+2.)+.005)/(pow(len+.5, 2.)) + (.00001*o_postLuminance)/(pow(len+.01, 2.));
+      float light = (.0008*log2(o_postLuminance+2.)+.005)/(pow(len+.5, 2.)) + (.00001*o_postLuminance)/(pow(len+.01, 2.));
       outColor = vec4(vec3(light),1.);
     }`
 

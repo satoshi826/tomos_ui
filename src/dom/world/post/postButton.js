@@ -39,7 +39,7 @@ export const delPostButton = (x, y) => {
 
 export function postButton() {
 
-  requestAnimationFrame(() => {
+  queueMicrotask(() => {
 
     let settedPoints = {}
 

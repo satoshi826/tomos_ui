@@ -16,7 +16,10 @@ export let peerManager
 export function core() {
   post()
   user()
-  getId().then(id => peerManager = new PeerManager({myUserId: id}))
+  getId().then(id => {
+    peerManager = new PeerManager({myUserId: id})
+    peerManager.signalingLoop()
+  })
 
   watchCamera((cameraPosition) => {
     sendState({cameraPosition})

@@ -15,7 +15,7 @@ export const [watchCanvasSize, setCanvasSize, getCanvasSize] = state({key: 'canv
 
 export function canvas() {
 
-  requestAnimationFrame(() => {
+  queueMicrotask(() => {
     const {canvasE, canvasWrapperE} = init()
     watchResize(canvasE)
     sendResize()
@@ -98,11 +98,11 @@ const sendMouse = (canvasWrapperE) => {
   canvasWrapperE._on.mousemove = (event) => {
     const x = 2 * (event.offsetX / canvasWrapperE.offsetWidth) - 1
     const y = - (2 * (event.offsetY / canvasWrapperE.offsetHeight) - 1)
-    sendState({mouse: {x, y}})
+    sendState({mouse: [x, y]})
   }
 
   canvasWrapperE.onmouseleave = () => {
-    sendState({mouse: {x: null, y: null}})
+    sendState({mouse: [null, null]})
   }
 
 }

@@ -5,7 +5,7 @@ import {setIsOpenSidebar} from './frame'
 
 export function tool(content = '') {
 
-  requestAnimationFrame(() => {
+  queueMicrotask(() => {
     const menuButtonE = id('menu-button')
     menuButtonE._on.click = () => setIsOpenSidebar((v) => !v)
   })
@@ -33,7 +33,7 @@ const toolBarC = {
   ..._.flex({align: 'center', justify: 'space-between'}),
   ..._.minH('var(--topbar-height)'),
   contain: 'strict',
-  zIndex : 1100,
+  zIndex : 1100
   // borderBottom: `3px solid ${_.getColor('background', 3, 0.8)}`,
 }
 
@@ -44,12 +44,12 @@ const menuButtonC = {
   ..._.wh('64px'),
   ..._.bRd('50%'),
   cursor: 'pointer',
-  ..._.rlt,
+  ..._.rlt
 }
 
 
 const menuButtonHoverC = {
   ..._.txC({type: 'primary', i: 0}),
-  ..._.txGrow(10),
+  ..._.txGrow(10)
 }
 
