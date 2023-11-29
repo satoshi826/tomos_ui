@@ -48,11 +48,12 @@ export const grid = () => ({
       return grids;
     }
 
-    float getRect(vec2 currentP, vec2 mousePosSteped, float scale){
+    float getRect(vec2 currentP, vec2 mousePos, float scale){
+      vec2 mousePosSteped = scale*floor(mousePos / scale);
       float margin = scale*.5;
-      float rect =
-      2.*step(1.5, smoothstep(.47, 1.-abs(mousePosSteped.x+margin-currentP.x), 1.)+smoothstep(.47, 1.-abs(mousePosSteped.y+margin-currentP.y), 1.)
-                -0.5*(smoothstep(.52, 1.-abs(mousePosSteped.x+margin-currentP.x), 1.)+smoothstep(.52, 1.-abs(mousePosSteped.y+margin-currentP.y), 1.)) );
+      float cross1 = smoothstep(.48, 1.-abs(mousePosSteped.x+margin-currentP.x)/scale, 1.)+smoothstep(.48, 1.-abs(mousePosSteped.y+margin-currentP.y)/scale,1.);
+      float cross2 = smoothstep(.52, 1.-abs(mousePosSteped.x+margin-currentP.x)/scale, 1.)+smoothstep(.52, 1.-abs(mousePosSteped.y+margin-currentP.y)/scale,1.);
+      float rect = .5*step(1.5, cross1-0.5*cross2);
       return rect;
     }
 
@@ -67,10 +68,8 @@ export const grid = () => ({
 
       vec2 aspectedMouse = a*mouse;
       vec2 mousePos = (aspectedMouse * scale * .5) + cameraPosition.xy;
-      vec2 mousePosSteped = floor(mousePos);
-      float rect = getRect(currentP, mousePosSteped, 1.);
-      float rect2 = getRect(currentP, mousePosSteped, 10.);
-
+      float rect = getRect(currentP, mousePos, 1.);
+      float rect2 = getRect(currentP, mousePos, 10.);
       outColor = vec4(vec3(grids+rect+rect2), 1.);
     }`
 
