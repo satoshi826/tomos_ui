@@ -6,12 +6,14 @@ import {state} from '../../../lib/state'
 import {oForEach, clamp} from '../../../lib/util'
 import {postionAdapter} from './util'
 import {getCamera, setCamera} from '../../core'
+import {setMouse} from '../../core/mouse'
 
 import CanvasWorker from '../../webgl/worker?worker'
 const canvasWorker = new CanvasWorker()
 
 export const sendState = (object) => canvasWorker.postMessage({state: object})
 export const [watchCanvasSize, setCanvasSize, getCanvasSize] = state({key: 'canvasSize', init: [100, 100]})
+export const [watchCanvasAspect, setCanvasAspect, getCanvasAspect] = state({key: 'canvasAspect', init: [1, 1]})
 
 export function canvas() {
 
@@ -22,6 +24,7 @@ export function canvas() {
     sendMouse(canvasWrapperE)
     setPosition(canvasWrapperE)
     recieveState()
+    aspect()
   })
 
   style.set('#canvasWrapper', wrapperC)
@@ -93,16 +96,20 @@ const sendResize = () => {
   watchCanvasSize(([width, height]) => sendState({resize: {width, height}}))
 }
 
+const aspect = () => {
+  watchCanvasSize(([w, h]) => setCanvasAspect(w > h ? [w / h, 1] : [1, h / w]))
+}
+
 const sendMouse = (canvasWrapperE) => {
 
   canvasWrapperE._on.mousemove = (event) => {
     const x = 2 * (event.offsetX / canvasWrapperE.offsetWidth) - 1
     const y = - (2 * (event.offsetY / canvasWrapperE.offsetHeight) - 1)
-    sendState({mouse: [x, y]})
+    setMouse([x, y])
   }
 
   canvasWrapperE.onmouseleave = () => {
-    sendState({mouse: [null, null]})
+    setMouse([null, null])
   }
 
 }

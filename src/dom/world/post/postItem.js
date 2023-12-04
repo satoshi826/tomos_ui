@@ -1,4 +1,4 @@
-import {beforeend, id} from '../../../../lib/dom'
+import {beforeEnd, id} from '../../../../lib/dom'
 import {oForEachV} from '../../../../lib/util'
 import {style} from '../../../../lib/theme'
 import {snippets as _} from '../../../theme/snippets'
@@ -21,7 +21,7 @@ export function postItem() {
           <div id="post_${x}_${y}" class="worldPost" data-x="${x}" data-y="${y}" style="transform:${getTranslate(x, y)}">
             ${m}
           </div>`
-        beforeend(domContainerEl, postHTML)
+        beforeEnd(domContainerEl, postHTML)
       })
     })
   })

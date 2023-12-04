@@ -55,7 +55,6 @@ export async function main(core) {
   })
 
   setHandler('mouse', (mouse) => {
-    console.log(mouse)
     gridP.set({mouse})
   })
 

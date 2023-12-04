@@ -1,11 +1,12 @@
 import {id} from '../../../../lib/dom'
 import {oForEachK, oForEach, isEmptyO, easing} from '../../../../lib/util'
-import {_qsA, beforeend} from '../../../../lib/dom'
+import {_qsA, beforeEnd} from '../../../../lib/dom'
 import {style, icon} from '../../../../lib/theme'
 import {snippets as _} from '../../../theme/snippets'
 import {domContainerEl, getTranslate} from '../domContainer'
 import {postionAdapter} from '../../canvas/util'
 import {watchCamera, setCamera, getCamera} from '../../../core'
+import {watchMousePos} from '../../../core/mouse'
 import {getPost} from '../../../core/post'
 import {setEditPostMode} from '.'
 
@@ -15,19 +16,19 @@ const setPostButton = (x, y) => {
       <div id="post-button_${x}_${y}" class="PostButton" style="transform:${getTranslate(x, y)}">
         ${icon('local_fire_department', {size: '60px'})}
       </div>`
-  beforeend(domContainerEl, postHTML)
-  id(`post-button_${x}_${y}`).onclick = onClickPost(x, y)
+  beforeEnd(domContainerEl, postHTML)
+  // id(`post-button_${x}_${y}`).onclick = onClickPost(x, y)
 }
 
-const onClickPost = (x, y) => () => {
-  setEditPostMode([x, y])
-  const cur = getCamera()
-  easing(0, 1, 800, (v) => setCamera([
-    cur[0] + (x - cur[0]) * v,
-    cur[1] + (y - 0.5 - cur[1]) * v,
-    cur[2] + (2 - cur[2]) * v
-  ]))
-}
+// const onClickPost = (x, y) => () => {
+//   setEditPostMode([x, y])
+//   const cur = getCamera()
+//   easing(0, 1, 800, (v) => setCamera([
+//     cur[0] + (x - cur[0]) * v,
+//     cur[1] + (y - 0.5 - cur[1]) * v,
+//     cur[2] + (2 - cur[2]) * v
+//   ]))
+// }
 
 export const delPostButton = (x, y) => {
   const el = id(`post-button_${x}_${y}`)
@@ -40,46 +41,32 @@ export const delPostButton = (x, y) => {
 export function postButton() {
 
   queueMicrotask(() => {
-
-    let settedPoints = {}
-
-    const viewZ = 10
-
-    watchCamera((camera) => {
-      if (camera[2] < viewZ) {
-
-        let visiblePoints = postionAdapter.calcVisiblePoints(camera, 1.1)
-        oForEachK(settedPoints, key => {
-          settedPoints[key] = false
-        })
-
-        visiblePoints.forEach(point => {
-          if (settedPoints[point] === undefined) {
-            const [x, y] = point.split('_')
-            setPostButton(x, y)
-          }
-          settedPoints[point] = true
-        })
-
-        oForEach(settedPoints, ([k, v]) => {
-          if (!v) {
-            const [x, y] = k.split('_')
-            delPostButton(x, y)
-            delete settedPoints[k]
-          }
-        })
-        style.set('.PostButton', {...postButtonC, opacity: 1 * (1 - (camera[2] / viewZ))})
-      }else{
-        if (!isEmptyO(settedPoints)) {
-          _qsA(domContainerEl, '.PostButton').forEach(el => {
-            el.className = 'PostButton fadeOut'
-            el.remove()
-          })
-          style.set('.PostButton', {...postButtonC, opacity: 0})
-          settedPoints = {}
+    let x = null
+    let y = null
+    let buttonEl = null
+    watchMousePos(([nextX, nextY]) => {
+      if (x !== nextX || y !== nextY) {
+        x = nextX
+        y = nextY
+        if (!buttonEl) {
+          const postHTML = /* html */`
+            <div id="post-button" class="PostButton" style="transform:${getTranslate(x, y)}">
+              ${icon('local_fire_department', {size: '60px'})}
+            </div>`
+          beforeEnd(domContainerEl, postHTML)
+          buttonEl = id('post-button')
         }
+        buttonEl.style = `transform:${getTranslate(x, y)}`
       }
     })
+
+    // const viewZ = 10
+    // x &&= y &&= null
+    // if(buttonEl) {
+    //   buttonEl.remove()
+    //   buttonEl = null
+    // }
+
   })
 
   style.set('.PostButton', postButtonC)

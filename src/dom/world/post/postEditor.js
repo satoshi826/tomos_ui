@@ -1,5 +1,5 @@
 import {id} from '../../../../lib/dom'
-import {beforeend, addMultiEL, rmMultiEL} from '../../../../lib/dom'
+import {beforeEnd, addMultiEL, rmMultiEL} from '../../../../lib/dom'
 import {style} from '../../../../lib/theme'
 import {snippets as _} from '../../../theme/snippets'
 import {addPost} from '../../../core/post'
@@ -44,7 +44,7 @@ export function postEditor() {
       if (v) {
         addMultiEL(document, ['mousedown', 'touchstart'], closeEditor)
         style.set('#post-editor-wrapper', wrapperC)
-        if (!id('post-editor-wrapper')) beforeend(navbarEl, postEditor)
+        if (!id('post-editor-wrapper')) beforeEnd(navbarEl, postEditor)
         id('tomos-button').onclick = clickPost
       }
       if (!v) {

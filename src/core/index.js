@@ -5,6 +5,7 @@ import {infra4, mutation} from '../infra'
 import {PeerManager} from '../infra/webRTC/peerManager'
 import {addPost, post} from './post'
 import {user, getId} from './user'
+import {mouse} from './mouse'
 
 const initCamera = [0, 0, 5]
 export const [watchCamera, setCamera, getCamera] = state({key: 'cameraPosition', init: initCamera})
@@ -16,6 +17,7 @@ export let peerManager
 export function core() {
   post()
   user()
+  mouse()
   getId().then(id => {
     peerManager = new PeerManager({myUserId: id})
     peerManager.signalingLoop()
