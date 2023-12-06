@@ -14,8 +14,8 @@ export function mouse() {
     sendState({mouse})
     const [ax, ay] = positionAdapter.canvasAspect
     const [cx, cy, cz] = getCamera()
-    const nextX = Math.trunc(cx + (ax * mouse[0] * cz * 0.5))
-    const nextY = Math.trunc(cy + (ay * mouse[1] * cz * 0.5))
+    const nextX = Math.floor(cx + (ax * mouse[0] * cz * 0.5))
+    const nextY = Math.floor(cy + (ay * mouse[1] * cz * 0.5))
     if (x !== nextX || y !== nextY) {
       x = nextX
       y = nextY

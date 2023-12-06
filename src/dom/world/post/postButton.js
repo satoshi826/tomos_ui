@@ -6,9 +6,13 @@ import {snippets as _} from '../../../theme/snippets'
 import {domContainerEl, getTranslate} from '../domContainer'
 import {positionAdapter} from '../../canvas/util'
 import {watchCamera, setCamera, getCamera} from '../../../core'
-import {watchMouseTrunced} from '../../../core/mouse'
+import {watchMouseTrunced, getMouseTrunced} from '../../../core/mouse'
 import {getPost} from '../../../core/post'
 import {setEditPostMode} from '.'
+
+const getTranslatePost = (x, y) => {
+  return getTranslate(x + 0.5, y + 0.5)
+}
 
 const setPostButton = (x, y) => {
   if (getPost(x, y)) return
@@ -40,26 +44,47 @@ export const delPostButton = (x, y) => {
 
 export function postButton() {
 
+  let buttonEl = null
+  const viewZ = 4
+
+  const set = (x, y) => {
+    if (!buttonEl) {
+      const postHTML = /* html */`
+        <div id="post-button" class="PostButton" style="transform:${getTranslatePost(x, y)}">
+          ポスト
+          <!-- ${icon('local_fire_department', {size: '60px'})} -->
+        </div>`
+      beforeEnd(domContainerEl, postHTML)
+      buttonEl = id('post-button')
+    }
+    buttonEl.style = `transform:${getTranslatePost(x, y)}`
+  }
+
+  const del = () => {
+    if(buttonEl) {
+      buttonEl.remove()
+      buttonEl = null
+    }
+  }
+
+  const ctrBtn = (x, y, cz) => {
+    if (cz > viewZ) del()
+    else set(x, y)
+  }
+
   queueMicrotask(() => {
-    let buttonEl = null
     watchMouseTrunced(([x, y]) => {
-      if (!buttonEl) {
-        const postHTML = /* html */`
-            <div id="post-button" class="PostButton" style="transform:${getTranslate(x, y)}">
-              ${icon('local_fire_department', {size: '60px'})}
-            </div>`
-        beforeEnd(domContainerEl, postHTML)
-        buttonEl = id('post-button')
-      }
-      buttonEl.style = `transform:${getTranslate(x, y)}`
+      const [,, cz] = getCamera()
+      ctrBtn(x, y, cz)
     })
-    // const viewZ = 10
-    // x &&= y &&= null
-    // if(buttonEl) {
-    //   buttonEl.remove()
-    //   buttonEl = null
-    // }
+    watchCamera((camera) => {
+      const [,, cz] = camera
+      const [x, y] = getMouseTrunced()
+      ctrBtn(x, y, cz)
+    })
   })
+
+
 
   style.set('.PostButton', postButtonC)
   style.hover('.PostButton', postButtonHoverC)
@@ -71,10 +96,10 @@ export function postButton() {
 const postButtonC = {
   ..._.abs,
   ..._.wh('80px'),
-  ..._.txC({type: 'text', i: 0, alpha: 0.5}),
+  ..._.txC({type: 'text', i: 0, alpha: 0.8}),
   ..._.bgC({type: 'gray', i: 1, alpha: 0.5}),
   ..._.flex({align: 'center', justify: 'center'}),
-  ..._.bRd('50%'),
+  ..._.bRd('10%'),
   ..._.bgBlur(4),
   ..._.dur('0.2s'),
   ..._.breakWord,
