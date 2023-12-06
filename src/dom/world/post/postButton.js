@@ -99,7 +99,7 @@ const postButtonC = {
   ..._.txC({type: 'text', i: 0, alpha: 0.8}),
   ..._.bgC({type: 'gray', i: 1, alpha: 0.5}),
   ..._.flex({align: 'center', justify: 'center'}),
-  ..._.bRd('10%'),
+  ..._.bRd('0%'),
   ..._.bgBlur(4),
   ..._.dur('0.2s'),
   ..._.breakWord,
