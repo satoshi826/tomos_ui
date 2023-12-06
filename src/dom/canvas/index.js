@@ -14,6 +14,8 @@ const canvasWorker = new CanvasWorker()
 export const sendState = (object) => canvasWorker.postMessage({state: object})
 export const [watchCanvasSize, setCanvasSize, getCanvasSize] = state({key: 'canvasSize', init: [100, 100]})
 
+let canvasOffset = [0, 0]
+
 export function canvas() {
 
   queueMicrotask(() => {
@@ -83,8 +85,10 @@ const init = () => {
 }
 
 const watchResize = (canvasE) => {
-  const resizeObserver = new ResizeObserver((entries) => {
-    const {width, height} = entries[0].contentRect
+  const resizeObserver = new ResizeObserver(([entrie]) => {
+    const {width, height} = entrie.contentRect
+    const {x, y} = entrie.target.getBoundingClientRect()
+    canvasOffset = [x, y]
     setCanvasSize([width, height])
   })
   resizeObserver.observe(canvasE)
@@ -96,8 +100,8 @@ const sendResize = () => {
 
 const sendMouse = (canvasWrapperE) => {
   canvasWrapperE._on.mousemove = (event) => {
-    const x = 2 * (event.offsetX / canvasWrapperE.offsetWidth) - 1
-    const y = - (2 * (event.offsetY / canvasWrapperE.offsetHeight) - 1)
+    const x = 2 * ((event.clientX - canvasOffset[0]) / canvasWrapperE.offsetWidth) - 1
+    const y = - (2 * ((event.clientY - canvasOffset[1]) / canvasWrapperE.offsetHeight) - 1)
     setMouse([x, y])
   }
   canvasWrapperE.onmouseleave = () => {
@@ -106,7 +110,6 @@ const sendMouse = (canvasWrapperE) => {
 }
 
 const setPosition = (canvasWrapperE) => {
-
   let start = null
   let startCamera = null
   let baseDistance = null
@@ -140,7 +143,9 @@ const setPosition = (canvasWrapperE) => {
   }
 
   canvasWrapperE._on.wheel = (event) => {
-    const {offsetX, offsetY, deltaY} = event // ToDo: postと重なっているときの対応
+    const {clientX, clientY, deltaY} = event // ToDo: postと重なっているときの対応
+    const offsetX = clientX - canvasOffset[0]
+    const offsetY = clientY - canvasOffset[1]
     setCamera(([x, y, z]) => {
       const newZ = clamp(z + (z * deltaY / 1500), 1, 10000)
       if (z === newZ && (newZ === 1 || newZ === 10000)) return [x, y, z]
