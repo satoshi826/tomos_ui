@@ -2,7 +2,7 @@ import {state} from '../../../lib/state'
 
 const [watchResize] = state({key: 'canvasSize'})
 
-export const postionAdapter = {
+export const positionAdapter = {
 
   canvasWidht    : null,
   canvasHeight   : null,
@@ -27,10 +27,10 @@ export const postionAdapter = {
   },
 
   calcVisiblePoints(camera, margin = 1) {
-    const minX = camera[0] - margin * camera[2] * postionAdapter.canvasAspect[0] / 2
-    const maxX = camera[0] + margin * camera[2] * postionAdapter.canvasAspect[0] / 2
-    const minY = camera[1] - margin * camera[2] * postionAdapter.canvasAspect[1] / 2
-    const maxY = camera[1] + margin * camera[2] * postionAdapter.canvasAspect[1] / 2
+    const minX = camera[0] - margin * camera[2] * positionAdapter.canvasAspect[0] / 2
+    const maxX = camera[0] + margin * camera[2] * positionAdapter.canvasAspect[0] / 2
+    const minY = camera[1] - margin * camera[2] * positionAdapter.canvasAspect[1] / 2
+    const maxY = camera[1] + margin * camera[2] * positionAdapter.canvasAspect[1] / 2
     let visiblePoints = []
     for (let x = Math.trunc(minX); x < maxX; x++) {
       for (let y = Math.trunc(minY); y < maxY; y++) {
@@ -47,8 +47,8 @@ export const postionAdapter = {
 }
 
 watchResize(([width, height] = [1, 1]) => {
-  postionAdapter.canvasWidht = width
-  postionAdapter.canvasHeight = height
-  postionAdapter.canvasAspect = (width > height) ? [width / height, 1] : [1, height / width]
-  postionAdapter.canvasShortSide = Math.min(width, height)
+  positionAdapter.canvasWidht = width
+  positionAdapter.canvasHeight = height
+  positionAdapter.canvasAspect = (width > height) ? [width / height, 1] : [1, height / width]
+  positionAdapter.canvasShortSide = Math.min(width, height)
 })

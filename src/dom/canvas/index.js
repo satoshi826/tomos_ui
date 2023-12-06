@@ -4,7 +4,7 @@ import {snippets as _} from '../../theme/snippets'
 import {shape} from '../../theme/shape'
 import {state} from '../../../lib/state'
 import {oForEach, clamp} from '../../../lib/util'
-import {postionAdapter} from './util'
+import {positionAdapter} from './util'
 import {getCamera, setCamera} from '../../core'
 import {setMouse} from '../../core/mouse'
 
@@ -13,7 +13,6 @@ const canvasWorker = new CanvasWorker()
 
 export const sendState = (object) => canvasWorker.postMessage({state: object})
 export const [watchCanvasSize, setCanvasSize, getCanvasSize] = state({key: 'canvasSize', init: [100, 100]})
-export const [watchCanvasAspect, setCanvasAspect, getCanvasAspect] = state({key: 'canvasAspect', init: [1, 1]})
 
 export function canvas() {
 
@@ -24,7 +23,6 @@ export function canvas() {
     sendMouse(canvasWrapperE)
     setPosition(canvasWrapperE)
     recieveState()
-    aspect()
   })
 
   style.set('#canvasWrapper', wrapperC)
@@ -96,22 +94,15 @@ const sendResize = () => {
   watchCanvasSize(([width, height]) => sendState({resize: {width, height}}))
 }
 
-const aspect = () => {
-  watchCanvasSize(([w, h]) => setCanvasAspect(w > h ? [w / h, 1] : [1, h / w]))
-}
-
 const sendMouse = (canvasWrapperE) => {
-
   canvasWrapperE._on.mousemove = (event) => {
     const x = 2 * (event.offsetX / canvasWrapperE.offsetWidth) - 1
     const y = - (2 * (event.offsetY / canvasWrapperE.offsetHeight) - 1)
     setMouse([x, y])
   }
-
   canvasWrapperE.onmouseleave = () => {
     setMouse([null, null])
   }
-
 }
 
 const setPosition = (canvasWrapperE) => {
@@ -154,7 +145,7 @@ const setPosition = (canvasWrapperE) => {
       const newZ = clamp(z + (z * deltaY / 1500), 1, 10000)
       if (z === newZ && (newZ === 1 || newZ === 10000)) return [x, y, z]
       const zoomIn = deltaY < 0 ? 1 : -1
-      const [wx, wy] = postionAdapter.pxToNormal(offsetX, offsetY)
+      const [wx, wy] = positionAdapter.pxToNormal(offsetX, offsetY)
       const diffX = z * coffX * wx * 0.025 * zoomIn
       const diffY = z * coffY * wy * 0.025 * zoomIn
       return [x + diffX, y + diffY, newZ]
@@ -197,7 +188,7 @@ const setPosition = (canvasWrapperE) => {
         const newZ = clamp(z + (z * -zoom), 1, 10000)
         if (z === newZ && (newZ === 1 || newZ === 10000)) return [x, y, z]
         const zoomIn = zoom > 0 ? 1 : -1
-        const [wx, wy] = postionAdapter.pxToNormal((x1 + x2) / 2, ((y1 + y2) / 2) - topBarHeight)
+        const [wx, wy] = positionAdapter.pxToNormal((x1 + x2) / 2, ((y1 + y2) / 2) - topBarHeight)
         const diffX = z * coffX * wx * 0.01 * zoomIn
         const diffY = z * coffY * wy * 0.01 * zoomIn
         return [x + diffX, y + diffY, newZ]

@@ -4,9 +4,9 @@ import {_qsA, beforeEnd} from '../../../../lib/dom'
 import {style, icon} from '../../../../lib/theme'
 import {snippets as _} from '../../../theme/snippets'
 import {domContainerEl, getTranslate} from '../domContainer'
-import {postionAdapter} from '../../canvas/util'
+import {positionAdapter} from '../../canvas/util'
 import {watchCamera, setCamera, getCamera} from '../../../core'
-import {watchMousePos} from '../../../core/mouse'
+import {watchMouseTrunced} from '../../../core/mouse'
 import {getPost} from '../../../core/post'
 import {setEditPostMode} from '.'
 
@@ -41,32 +41,24 @@ export const delPostButton = (x, y) => {
 export function postButton() {
 
   queueMicrotask(() => {
-    let x = null
-    let y = null
     let buttonEl = null
-    watchMousePos(([nextX, nextY]) => {
-      if (x !== nextX || y !== nextY) {
-        x = nextX
-        y = nextY
-        if (!buttonEl) {
-          const postHTML = /* html */`
+    watchMouseTrunced(([x, y]) => {
+      if (!buttonEl) {
+        const postHTML = /* html */`
             <div id="post-button" class="PostButton" style="transform:${getTranslate(x, y)}">
               ${icon('local_fire_department', {size: '60px'})}
             </div>`
-          beforeEnd(domContainerEl, postHTML)
-          buttonEl = id('post-button')
-        }
-        buttonEl.style = `transform:${getTranslate(x, y)}`
+        beforeEnd(domContainerEl, postHTML)
+        buttonEl = id('post-button')
       }
+      buttonEl.style = `transform:${getTranslate(x, y)}`
     })
-
     // const viewZ = 10
     // x &&= y &&= null
     // if(buttonEl) {
     //   buttonEl.remove()
     //   buttonEl = null
     // }
-
   })
 
   style.set('.PostButton', postButtonC)

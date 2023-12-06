@@ -32,7 +32,7 @@ export function postItem() {
     ..._.abs,
     ..._.wh(`${BASE_SCALE * 0.8}px`),
     ..._.f('12px'),
-    ..._.txC({type: 'background'}),
+    // ..._.txC({type: 'background'}),
     // ..._.bgC({i: 2, alpha: 0.5}),
     // ..._.bgBlur(4),
     // ..._.bRd('50%'),

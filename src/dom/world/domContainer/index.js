@@ -2,7 +2,7 @@ import {id} from '../../../../lib/dom'
 import {style} from '../../../../lib/theme'
 import {debounce} from '../../../../lib/util'
 import {snippets as _} from '../../../theme/snippets'
-import {postionAdapter} from '../../canvas/util'
+import {positionAdapter} from '../../canvas/util'
 import {watchCamera, getCamera} from '../../../core'
 import {watchCanvasSize} from '../../canvas'
 
@@ -57,7 +57,7 @@ export function domContainer() {
 
   let currentZ = Infinity
   const setContainer = (node, camera) => {
-    const [tx, ty] = postionAdapter.worldToPx([0, 0], camera)
+    const [tx, ty] = positionAdapter.worldToPx([0, 0], camera)
     if(camera[2] < 8 && currentZ > camera[2]) {
       toggleWillChangeIN()
       currentZ = camera[2]
@@ -66,7 +66,7 @@ export function domContainer() {
       toggleWillChangeOUT()
       currentZ = 8
     }
-    node.style.transform = `translate(${tx}px, ${ty}px) scale(${(postionAdapter.canvasShortSide) / (camera[2] * BASE_SCALE)})`
+    node.style.transform = `translate(${tx}px, ${ty}px) scale(${(positionAdapter.canvasShortSide) / (camera[2] * BASE_SCALE)})`
   }
 
 }
