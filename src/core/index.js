@@ -83,7 +83,7 @@ export function core() {
         {
           'x.y': [x, y],
           m    : post.m,
-          l    : Math.pow(10, random(-1, 2))
+          l    : post.l ?? Math.pow(10, random(-1, 2))
         }
       ]
     })
